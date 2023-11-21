@@ -8,7 +8,7 @@ export class GetUserByEmailUseCase {
 		try {
 			return await this.userRepository.getOneByEmail(email);
 		} catch (error: any) {
-			throw Error;
+			throw error;
 		}
 	}
 }
