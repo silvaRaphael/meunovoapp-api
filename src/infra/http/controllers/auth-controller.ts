@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { signInSchema, signOutSchema } from "@adapters/auth";
+import { signInSchema, tokenSchema } from "@adapters/auth";
+import { AuthRequest } from "@config/auth-request";
 
 export class AuthController {
 	constructor(
@@ -21,20 +22,20 @@ export class AuthController {
 			res.status(200).send(response);
 		} catch (error: any) {
 			error.name = undefined;
-			res.status(400).send({ error: error });
+			res.status(400).send({ error });
 		}
 	}
 
 	async signOut(req: Request, res: Response) {
 		try {
-			const { token } = signOutSchema.parse(req.params);
+			const token = tokenSchema.parse((req as AuthRequest).token);
 
 			await this.signOutUseCase.execute(token);
 
 			res.status(200).send();
 		} catch (error: any) {
 			error.name = undefined;
-			res.status(400).send({ error: error });
+			res.status(400).send({ error });
 		}
 	}
 }

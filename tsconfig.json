@@ -39,6 +39,7 @@
       "@controllers/*": ["src/infra/http/controllers/*"],
       "@utils/*": ["src/infra/http/utils/*"],
       "@adapters/*": ["src/infra/adapters/*"],
+      "@config/*": ["src/infra/config/*"],
       "@db/*": ["src/infra/database/*"],
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

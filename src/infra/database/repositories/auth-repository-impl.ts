@@ -1,4 +1,5 @@
 import { PrismaType } from "@db/prisma";
+import { User } from "@domain/user";
 import { AuthRepository } from "@repositories/auth-repository";
 
 export class AuthRepositoryImpl implements AuthRepository {
@@ -35,6 +36,22 @@ export class AuthRepositoryImpl implements AuthRepository {
 			if (!response) throw Error;
 		} catch (error: any) {
 			throw new Error("Não foi possível sair.");
+		}
+	}
+
+	async validateToken(token: string): Promise<User | null> {
+		try {
+			const response = await this.database.user.findFirst({
+				where: {
+					token,
+				},
+			});
+
+			if (!response) return null;
+
+			return response as User;
+		} catch (error: any) {
+			throw new Error("Não foi possível validar o token.");
 		}
 	}
 }

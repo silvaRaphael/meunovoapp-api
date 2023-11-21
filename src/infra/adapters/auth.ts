@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const tokenSchema = z
+	.string({
+		required_error: "Token é necessário.",
+	})
+	.uuid({
+		message: "Token válido é necessário.",
+	});
+
 export const signInSchema = z.object({
 	email: z
 		.string({
@@ -14,15 +22,5 @@ export const signInSchema = z.object({
 		})
 		.min(6, {
 			message: "A senha deve ter ao menos 6 digitos.",
-		}),
-});
-
-export const signOutSchema = z.object({
-	token: z
-		.string({
-			required_error: "Token é necessário.",
-		})
-		.uuid({
-			message: "Token válido é necessário.",
 		}),
 });

@@ -99,6 +99,7 @@ const config = {
 		"^@controllers/(.*)$": ["<rootDir>/src/infra/http/controllers/$1"],
 		"^@utils/(.*)$": ["<rootDir>/src/infra/http/utils/$1"],
 		"^@adapters/(.*)$": ["<rootDir>/src/application/adapters/$1"],
+		"^@config/(.*)$": ["<rootDir>/src/infra/config/$1"],
 		"^@db/(.*)$": ["<rootDir>/src/infra/database/$1"],
 	},
 
