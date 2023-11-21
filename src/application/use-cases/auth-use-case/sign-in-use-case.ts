@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { compareSync } from "bcryptjs";
+import { compareSync } from "bcrypt";
 import { AuthRepository } from "@repositories/auth-repository";
 import { UserRepository } from "@repositories/user-repository";
 import { SignInCredentials } from "@dtos/auth-credentials";
