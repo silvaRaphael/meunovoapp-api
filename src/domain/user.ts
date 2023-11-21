@@ -4,25 +4,28 @@ import { hashSync } from "bcryptjs";
 export type Roles = "admin" | "client";
 
 export interface IUser {
-  id?: string;
-  name: string;
-  email: string;
-  password: string;
-  role: Roles;
+	id?: string;
+	name: string;
+	email: string;
+	password: string;
+	role: Roles;
+	token?: string;
 }
 
 export class User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: Roles;
+	id: string;
+	name: string;
+	email: string;
+	password: string;
+	role: Roles;
+	token: string | null;
 
-  constructor({ id, name, email, password, role }: IUser) {
-    this.id = id || randomUUID();
-    this.name = name;
-    this.email = email;
-    this.password = hashSync(password);
-    this.role = role;
-  }
+	constructor({ id, name, email, password, role, token }: IUser) {
+		this.id = id || randomUUID();
+		this.name = name;
+		this.email = email;
+		this.password = hashSync(password);
+		this.role = role;
+		this.token = token || null;
+	}
 }
