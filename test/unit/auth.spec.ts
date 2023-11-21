@@ -8,6 +8,7 @@ import { AuthRepository } from "@repositories/auth-repository";
 import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
 import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
+import { ValidateTokenUseCase } from "@use-cases/auth-use-case/validate-token-use-case";
 
 describe("Auth tests", () => {
 	let authRepository: AuthRepository;
@@ -16,6 +17,7 @@ describe("Auth tests", () => {
 
 	let signInUseCase: SignInUseCase;
 	let signOutUseCase: SignOutUseCase;
+	let validateTokenUseCase: ValidateTokenUseCase;
 
 	let getAllUsersUseCase: GetAllUsersUseCase;
 	let getUserUseCase: GetUserUseCase;
@@ -30,6 +32,7 @@ describe("Auth tests", () => {
 
 		signInUseCase = new SignInUseCase(authRepository, userRepository);
 		signOutUseCase = new SignOutUseCase(authRepository);
+		validateTokenUseCase = new ValidateTokenUseCase(authRepository);
 
 		getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
 		getUserUseCase = new GetUserUseCase(userRepository);
@@ -41,8 +44,6 @@ describe("Auth tests", () => {
 			email: "raphaeltiago02@gmail.com",
 			password: "MNapp2023@",
 		});
-
-		console.log(response.token);
 
 		token = response.token || "";
 
@@ -58,6 +59,18 @@ describe("Auth tests", () => {
 		} catch (error: any) {
 			expect(error.message).toBe("E-mail não encontrado.");
 		}
+	});
+
+	it("should validate token", async () => {
+		const response = await validateTokenUseCase.execute(token);
+
+		expect(response).not.toBeNull();
+	});
+
+	it("should not validate token with wrong token", async () => {
+		const response = await validateTokenUseCase.execute("wrong-token");
+
+		expect(response).toBeNull();
 	});
 
 	it("should sign out", async () => {
