@@ -1,4 +1,4 @@
-import { tokenSchema } from "@adapters/auth";
+import { tokenSchema } from "src/application/adapters/auth";
 import { AuthRequest } from "@config/auth-request";
 import { prisma } from "@db/prisma";
 import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
@@ -21,11 +21,12 @@ export const AuthMiddleware = async (
 
 		const parsedToken = tokenSchema.parse(token);
 
-		const response = await new ValidateTokenUseCase(
-			new AuthRepositoryImpl(prisma),
-		).execute(parsedToken);
+		if (!(req.session as any).user.token)
+			throw new Error("Token expirado.");
 
-		if (!response?.id) throw new Error("Token expirado.");
+		const response = (req.session as any).user;
+
+		if (response.token !== token) throw new Error("Token expirado.");
 
 		(req as AuthRequest).token = parsedToken;
 		(req as AuthRequest).userId = response.id;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { signInSchema, tokenSchema } from "@adapters/auth";
+import { signInSchema, tokenSchema } from "src/application/adapters/auth";
 import { AuthRequest } from "@config/auth-request";
 
 export class AuthController {
@@ -19,7 +19,14 @@ export class AuthController {
 				password,
 			});
 
-			res.status(200).send(response);
+			(response as any).password = undefined;
+
+			(req.session as any).user = response;
+
+			req.session.save((error: any) => {
+				if (error) throw error;
+				res.status(200).json(response);
+			});
 		} catch (error: any) {
 			error.name = undefined;
 			res.status(400).send({ error });
@@ -31,6 +38,8 @@ export class AuthController {
 			const token = tokenSchema.parse((req as AuthRequest).token);
 
 			await this.signOutUseCase.execute(token);
+
+			req.session.destroy(() => {});
 
 			res.status(200).send();
 		} catch (error: any) {

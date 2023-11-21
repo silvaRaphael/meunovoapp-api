@@ -7,6 +7,7 @@ export const tokenSchema = z
 	.uuid({
 		message: "Token válido é necessário.",
 	});
+export type TokenSchema = z.infer<typeof tokenSchema>;
 
 export const signInSchema = z.object({
 	email: z
@@ -24,3 +25,4 @@ export const signInSchema = z.object({
 			message: "A senha deve ter ao menos 6 digitos.",
 		}),
 });
+export type SignInSchema = z.infer<typeof signInSchema>;

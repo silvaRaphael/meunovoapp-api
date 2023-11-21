@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { compareSync } from "bcrypt";
 import { AuthRepository } from "@repositories/auth-repository";
 import { UserRepository } from "@repositories/user-repository";
-import { SignInCredentials } from "@dtos/auth-credentials";
+import { SignInSchema } from "@adapters/auth";
 import { User } from "@domain/user";
 
 export class SignInUseCase {
@@ -11,7 +11,7 @@ export class SignInUseCase {
 		private userRepository: UserRepository,
 	) {}
 
-	async execute({ email, password }: SignInCredentials): Promise<User> {
+	async execute({ email, password }: SignInSchema): Promise<User> {
 		try {
 			const response = await this.userRepository.getOneByEmail(email);
 

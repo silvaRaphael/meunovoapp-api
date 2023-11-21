@@ -90,7 +90,6 @@ const config = {
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
 	moduleNameMapper: {
-		"^@dtos/(.*)$": ["<rootDir>/src/application/DTOs/$1"],
 		"^@domain/(.*)$": ["<rootDir>/src/domain/$1"],
 		"^@repositories/(.*)$": ["<rootDir>/src/application/repositories/$1"],
 		"^@impl/(.*)$": ["<rootDir>/src/infra/database/repositories/$1"],
