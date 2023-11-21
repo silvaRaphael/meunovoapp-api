@@ -17,7 +17,7 @@ export class AuthRepositoryImpl implements AuthRepository {
 
 			if (!response) throw Error;
 		} catch (error: any) {
-			throw new Error("DB Error.");
+			throw new Error("Não foi possível fazer login.");
 		}
 	}
 
@@ -34,7 +34,7 @@ export class AuthRepositoryImpl implements AuthRepository {
 
 			if (!response) throw Error;
 		} catch (error: any) {
-			throw new Error("DB Error.");
+			throw new Error("Não foi possível sair.");
 		}
 	}
 }

@@ -20,19 +20,21 @@ export class AuthController {
 
 			res.status(200).send(response);
 		} catch (error: any) {
-			res.status(400).send({ error: error.message });
+			error.name = undefined;
+			res.status(400).send({ error: error });
 		}
 	}
 
 	async signOut(req: Request, res: Response) {
 		try {
-			const { token } = signOutSchema.parse(req.body);
+			const { token } = signOutSchema.parse(req.params);
 
 			await this.signOutUseCase.execute(token);
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(400).send({ error: error.message });
+			error.name = undefined;
+			res.status(400).send({ error: error });
 		}
 	}
 }

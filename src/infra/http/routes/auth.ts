@@ -4,7 +4,7 @@ import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
 import { UserRepositoryImpl } from "@impl/user-repository-impl";
 import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { AuthController } from "@controllers/auth";
+import { AuthController } from "@controllers/auth-controller";
 
 const routes = Router();
 
@@ -20,7 +20,7 @@ routes.post("/sign-in", (req, res) => {
 	authController.signIn(req, res);
 });
 
-routes.get("/sign-out", (req, res) => {
+routes.get("/sign-out/:token", (req, res) => {
 	authController.signOut(req, res);
 });
 
