@@ -1,8 +1,8 @@
-import { UserRepository } from "../../src/application/repositories/user-repository";
-import { GetAllUsersUseCase } from "../../src/application/use-cases/user-use-case/get-all-users-use-case";
-import { GetUserUseCase } from "../../src/application/use-cases/user-use-case/get-user-use-case";
-import { prisma } from "../../src/infra/database/prisma";
-import { UserRepositoryImpl } from "../../src/infra/database/repositories/user-repository-impl";
+import { prisma } from "@db/prisma";
+import { UserRepository } from "@repositories/user-repository";
+import { UserRepositoryImpl } from "@impl//user-repository-impl";
+import { GetAllUsersUseCase } from "@use-cases/user-use-case/get-all-users-use-case";
+import { GetUserUseCase } from "@use-cases/user-use-case/get-user-use-case";
 
 describe("User tests", () => {
     let userRepository: UserRepository;
