@@ -15,7 +15,7 @@ export const signInSchema = z.object({
 			required_error: "E-mail é necessário.",
 		})
 		.email({
-			message: "E-mail é necessário.",
+			message: "E-mail válido é necessário.",
 		}),
 	password: z
 		.string({
@@ -23,6 +23,7 @@ export const signInSchema = z.object({
 		})
 		.min(6, {
 			message: "A senha deve ter ao menos 6 digitos.",
-		}),
+		})
+		.max(20, { message: "A senha deve ter ao máximo 20 digitos." }),
 });
 export type SignInSchema = z.infer<typeof signInSchema>;

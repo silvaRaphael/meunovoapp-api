@@ -3,6 +3,7 @@ import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
 import { signInSchema, tokenSchema } from "src/application/adapters/auth";
 import { AuthRequest } from "@config/auth-request";
+import { HandleError } from "@utils/handle-error";
 
 export class AuthController {
 	constructor(
@@ -28,8 +29,7 @@ export class AuthController {
 				res.status(200).json(response);
 			});
 		} catch (error: any) {
-			error.name = undefined;
-			res.status(400).send({ error });
+			res.status(400).send({ error: HandleError(error) });
 		}
 	}
 
@@ -43,8 +43,7 @@ export class AuthController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			error.name = undefined;
-			res.status(400).send({ error });
+			res.status(400).send({ error: HandleError(error) });
 		}
 	}
 }

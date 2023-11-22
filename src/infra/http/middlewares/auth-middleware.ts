@@ -1,9 +1,7 @@
 import { tokenSchema } from "src/application/adapters/auth";
 import { AuthRequest } from "@config/auth-request";
-import { prisma } from "@db/prisma";
-import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
-import { ValidateTokenUseCase } from "@use-cases/auth-use-case/validate-token-use-case";
 import { NextFunction, Request, Response } from "express";
+import { HandleError } from "@utils/handle-error";
 
 export const AuthMiddleware = async (
 	req: Request,
@@ -33,7 +31,6 @@ export const AuthMiddleware = async (
 
 		next();
 	} catch (error: any) {
-		error.name = undefined;
-		res.status(401).json({ error });
+		res.status(400).send({ error: HandleError(error) });
 	}
 };
