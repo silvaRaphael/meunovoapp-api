@@ -22,7 +22,7 @@ const emailController = new EmailController(
 	getEmailUseCase,
 );
 
-routes.post("/send", AuthMiddleware, (req, res) => {
+routes.post("/send", (req, res) => {
 	emailController.sendEmail(req, res);
 });
 
