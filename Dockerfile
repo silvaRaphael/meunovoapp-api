@@ -19,6 +19,7 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/build ./build
 COPY package*.json ./
 COPY prisma ./
+COPY .env ./
 
 RUN npm install --production
 
