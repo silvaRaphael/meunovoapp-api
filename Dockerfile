@@ -21,7 +21,7 @@ COPY package*.json ./
 COPY prisma ./
 COPY .env ./
 
-RUN npm install --production
+RUN npm install --omit=dev
 
 EXPOSE 3000
 
