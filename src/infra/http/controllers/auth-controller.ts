@@ -20,6 +20,7 @@ export class AuthController {
 				password,
 			});
 
+			(response as any).id = undefined;
 			(response as any).password = undefined;
 
 			(req.session as any).user = response;

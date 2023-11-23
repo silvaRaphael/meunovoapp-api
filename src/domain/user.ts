@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { hashSync } from "bcryptjs";
+import { hashSync } from "bcrypt";
 
 export type Roles = "admin" | "client";
 
@@ -24,7 +24,7 @@ export class User {
 		this.id = id || randomUUID();
 		this.name = name;
 		this.email = email;
-		this.password = hashSync(password);
+		this.password = hashSync(password, 8);
 		this.role = role;
 		this.token = token || null;
 	}
