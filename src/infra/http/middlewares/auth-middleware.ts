@@ -19,7 +19,7 @@ export const AuthMiddleware = async (
 
 		const parsedToken = tokenSchema.parse(token);
 
-		if (!(req.session as any).user.token)
+		if (!(req.session as any).user || !(req.session as any).user.token)
 			throw new Error("Token expirado.");
 
 		const response = (req.session as any).user;

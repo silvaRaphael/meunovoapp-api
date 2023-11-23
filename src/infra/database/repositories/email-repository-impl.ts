@@ -63,15 +63,12 @@ export class EmailRepositoryImpl implements EmailRepository {
 				if (limit) filter.take = limit;
 			}
 
-			console.log(filter);
-
 			const response = await this.database.email.findMany(filter);
 
 			if (!response) return [];
 
 			return response as unknown as Email[];
 		} catch (error: any) {
-			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}
