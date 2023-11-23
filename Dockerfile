@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm run migrate
+
 RUN npm run build
 
 FROM node:lts-alpine
@@ -21,4 +23,4 @@ RUN npm install --production
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run migrate && npm start"]
+CMD [ "npm", "start" ]

@@ -3,7 +3,7 @@ import { compareSync } from "bcrypt";
 import { AuthRepository } from "../../repositories/auth-repository";
 import { UserRepository } from "../../repositories/user-repository";
 import { SignInSchema } from "../../adapters/auth";
-import { User } from "@prisma/client";
+import { User } from "../../../domain/user";
 
 export class SignInUseCase {
 	constructor(

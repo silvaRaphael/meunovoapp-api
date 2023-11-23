@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "../../../domain/user";
 import { AuthRepository } from "../../repositories/auth-repository";
 
 export class ValidateTokenUseCase {
