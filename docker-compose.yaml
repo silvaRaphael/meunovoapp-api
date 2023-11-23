@@ -8,19 +8,17 @@ services:
       - "3000:3000"
     depends_on:
       - postgres
-
-    postgres:
-      image: postgres:latest
-      environment:
-        POSTGRES_USER: meunovoapp
-        POSTGRES_PASSWORD: MNapp2023
-        POSTGRES_DB: meunovoapp
-
-    nginx:
-      image: nginx:latest
-      ports:
-        - "80:80"
-      volumes:
-        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      depends_on:
-        - node-app
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: meunovoapp
+      POSTGRES_PASSWORD: MNapp2023
+      POSTGRES_DB: meunovoapp
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - node-app
