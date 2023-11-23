@@ -23,7 +23,8 @@ model Email {
   id       String @id @unique
   name     String
   from    String
-  to String
+  to String[]
+  subject String
   html     String
-  sended_at DateTime
+  created_at DateTime
 }

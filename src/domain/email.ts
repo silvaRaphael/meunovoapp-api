@@ -1,28 +1,31 @@
 import { randomUUID } from "node:crypto";
 
 export interface IEmail {
-    id?: string;
-    sender: string;
-    from: string;
-    to: string;
-    html: string;
-    sended_at?: Date;
+	id?: string;
+	name: string;
+	from: string;
+	to: string[];
+	subject: string;
+	html: string;
+	created_at?: Date;
 }
 
 export class Email {
-    id: string;
-    sender: string;
-    from: string;
-    to: string;
-    html: string;
-    sended_at: Date;
+	id: string;
+	name: string;
+	from: string;
+	to: string[];
+	subject: string;
+	html: string;
+	created_at: Date;
 
-    constructor({ id, sender, from, to, html, sended_at }: IEmail) {
-        this.id = id || randomUUID();
-        this.sender = sender;
-        this.from = from;
-        this.to = to;
-        this.html = html;
-        this.sended_at = sended_at || new Date();
-    }
+	constructor({ id, name, from, to, subject, html, created_at }: IEmail) {
+		this.id = id || randomUUID();
+		this.name = name;
+		this.from = from;
+		this.to = to;
+		this.subject = subject;
+		this.html = html;
+		this.created_at = created_at || new Date();
+	}
 }
