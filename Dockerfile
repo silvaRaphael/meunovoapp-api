@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm run migrate
-
 RUN npm run build
 
 FROM node:lts-alpine
