@@ -10,7 +10,6 @@
 		"test": "jest",
 		"test:unit": "jest test/unit"
 	},
-	"type": "module",
 	"keywords": [],
 	"author": "silvaRaphael",
 	"license": "ISC",
