@@ -2,7 +2,7 @@ import { Email } from "../../domain/email";
 
 export interface EmailFilter {
 	name?: string;
-	from?: string;
+	from?: string[];
 	to?: string;
 	subject?: string;
 	html?: string;

@@ -25,6 +25,7 @@ describe("Email tests", () => {
 	beforeAll(() => {
 		emailRepository = new EmailRepositoryImpl(prisma, resend);
 
+		sendEmailUseCase = new SendEmailUseCase(emailRepository);
 		getAllEmailsUseCase = new GetAllEmailsUseCase(emailRepository);
 		getEmailUseCase = new GetEmailUseCase(emailRepository);
 	});
@@ -33,17 +34,20 @@ describe("Email tests", () => {
 		expect(await sendEmailUseCase.execute(emailToSend)).toBeUndefined();
 	});
 
-	// it("should get all emails", async () => {
-	// 	const response = await getAllEmailsUseCase.execute();
+	it("should get all emails", async () => {
+		const response = await getAllEmailsUseCase.execute({
+			to: emailToSend.from,
+			from: [emailToSend.from],
+		});
 
-	// 	expect(response).toHaveLength(1);
-	// });
+		expect(response.length).toBeGreaterThan(0);
+	});
 
-	// it("should get one email by id", async () => {
-	// 	const response = await getEmailUseCase.execute(
-	// 		"3aeca3f9-584f-458c-8af5-a100f0ab6485",
-	// 	);
+	it("should get one email by id", async () => {
+		const response = await getEmailUseCase.execute(
+			"9e22487b-b6b3-4f4a-b984-79c3b1127f29",
+		);
 
-	// 	expect(response).toBeDefined();
-	// });
+		expect(response).toBeDefined();
+	});
 });

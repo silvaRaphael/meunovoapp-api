@@ -4,11 +4,13 @@ import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/
 import { HandleError } from "../utils/handle-error";
 import { GetAllEmailsUseCase } from "../../../application/use-cases/email-use-case/get-all-emails-use-case";
 import { AuthRequest } from "../../config/auth-request";
+import { GetEmailUseCase } from "../../../application/use-cases/email-use-case/get-email-use-case";
 
 export class EmailController {
 	constructor(
 		private sendEmailUseCase: SendEmailUseCase,
 		private getAllEmailsUseCase: GetAllEmailsUseCase,
+		private getEmailUseCase: GetEmailUseCase,
 	) {}
 
 	async sendEmail(req: Request, res: Response) {
@@ -33,10 +35,16 @@ export class EmailController {
 
 	async getAllEmails(req: Request, res: Response) {
 		try {
-			const response = await this.getAllEmailsUseCase.execute({
-				from: (req as AuthRequest).userEmail,
-				to: (req as AuthRequest).userEmail,
-			});
+			const { userEmail } = req as AuthRequest;
+
+			const filter = userEmail
+				? {
+						from: [userEmail],
+						to: userEmail,
+				  }
+				: {};
+
+			const response = await this.getAllEmailsUseCase.execute(filter);
 
 			res.status(200).json(response);
 		} catch (error: any) {
@@ -44,5 +52,15 @@ export class EmailController {
 		}
 	}
 
-	async getEmail(req: Request, res: Response) {}
+	async getEmail(req: Request, res: Response) {
+		try {
+			const { id } = req.params;
+
+			const response = await this.getEmailUseCase.execute(id);
+
+			res.status(200).json(response);
+		} catch (error: any) {
+			res.status(400).send({ error: HandleError(error) });
+		}
+	}
 }

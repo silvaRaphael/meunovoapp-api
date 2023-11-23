@@ -3,8 +3,9 @@
  * https://jestjs.io/docs/configuration
  */
 
-/** @type {import('jest').Config} */
-const config = {
+import type { Config } from "jest";
+
+const config: Config = {
 	// All imported modules in your tests should be mocked automatically
 	// automock: false,
 
@@ -18,13 +19,13 @@ const config = {
 	clearMocks: true,
 
 	// Indicates whether the coverage information should be collected while executing the test
-	// collectCoverage: false,
+	collectCoverage: false,
 
 	// An array of glob patterns indicating a set of files for which coverage information should be collected
 	// collectCoverageFrom: undefined,
 
 	// The directory where Jest should output its coverage files
-	// coverageDirectory: undefined,
+	coverageDirectory: "coverage",
 
 	// An array of regexp pattern strings used to skip coverage collection
 	// coveragePathIgnorePatterns: [
@@ -32,7 +33,7 @@ const config = {
 	// ],
 
 	// Indicates which provider should be used to instrument code for coverage
-	coverageProvider: "babel",
+	coverageProvider: "v8",
 
 	// A list of reporter names that Jest uses when writing coverage reports
 	// coverageReporters: [
@@ -89,18 +90,7 @@ const config = {
 	// ],
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-	moduleNameMapper: {
-		"^@domain/(.*)$": ["<rootDir>/src/domain/$1"],
-		"^@repositories/(.*)$": ["<rootDir>/src/application/repositories/$1"],
-		"^@impl/(.*)$": ["<rootDir>/src/infra/database/repositories/$1"],
-		"^@use-cases/(.*)$": ["<rootDir>/src/application/use-cases/$1"],
-		"^@routes/(.*)$": ["<rootDir>/src/infra/http/routes/$1"],
-		"^@controllers/(.*)$": ["<rootDir>/src/infra/http/controllers/$1"],
-		"^@utils/(.*)$": ["<rootDir>/src/infra/http/utils/$1"],
-		"^@adapters/(.*)$": ["<rootDir>/src/application/adapters/$1"],
-		"^@config/(.*)$": ["<rootDir>/src/infra/config/$1"],
-		"^@db/(.*)$": ["<rootDir>/src/infra/database/$1"],
-	},
+	// moduleNameMapper: {},
 
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],
@@ -206,6 +196,7 @@ const config = {
 
 	// Whether to use watchman for file crawling
 	// watchman: true,
+	testTimeout: 20_000,
 };
 
 export default config;
