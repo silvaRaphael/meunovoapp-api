@@ -28,4 +28,8 @@ export class Email {
 		this.html = html;
 		this.created_at = created_at || new Date();
 	}
+
+	setID(id: string) {
+		this.id = id;
+	}
 }

@@ -3,10 +3,43 @@ import {
 	EmailRepository,
 } from "../../../application/repositories/email-repository";
 import { Email } from "../../../domain/email";
+import { ResendType } from "../../providers/resend";
 import { PrismaType } from "../prisma";
 
 export class EmailRepositoryImpl implements EmailRepository {
-	constructor(private database: PrismaType) {}
+	constructor(private database: PrismaType, private mailSender: ResendType) {}
+
+	async send(email: Email): Promise<{ id: string }> {
+		try {
+			const response = (await this.mailSender.emails.send({
+				from: email.from,
+				to: email.to,
+				subject: email.subject,
+				html: email.html,
+			})) as { data: { id: string }; error?: any };
+
+			if (!response || response.error)
+				throw !response ? Error : new Error(response.error.message);
+
+			return { id: response.data.id };
+		} catch (error: any) {
+			throw error;
+		}
+	}
+
+	async create(email: Email): Promise<void> {
+		try {
+			const response = await this.database.email.create({
+				data: {
+					...email,
+				},
+			});
+
+			if (!response) throw Error;
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
 
 	async getAll(filters?: EmailFilter): Promise<Email[]> {
 		try {
@@ -15,12 +48,24 @@ export class EmailRepositoryImpl implements EmailRepository {
 					name: {
 						contains: filters?.name,
 					},
-					from: {
-						contains: filters?.from,
-					},
-					to: {
-						has: filters?.to,
-					},
+					OR: [
+						{
+							from: {
+								contains: filters?.from,
+							},
+							to: {
+								has: filters?.from,
+							},
+						},
+						{
+							to: {
+								has: filters?.to,
+							},
+							from: {
+								contains: filters?.to,
+							},
+						},
+					],
 					subject: {
 						contains: filters?.subject,
 					},
@@ -53,20 +98,6 @@ export class EmailRepositoryImpl implements EmailRepository {
 			if (!response) return null;
 
 			return response as unknown as Email;
-		} catch (error: any) {
-			throw new Error("DB Error.");
-		}
-	}
-
-	async create(email: Email): Promise<void> {
-		try {
-			const response = await this.database.email.create({
-				data: {
-					...email,
-				},
-			});
-
-			if (!response) throw Error;
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}

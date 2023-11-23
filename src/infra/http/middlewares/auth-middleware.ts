@@ -27,6 +27,7 @@ export const AuthMiddleware = async (
 		if (response.token !== token) throw new Error("Token expirado.");
 
 		(req as AuthRequest).token = parsedToken;
+		(req as AuthRequest).userEmail = response.email;
 		(req as AuthRequest).userId = response.id;
 
 		next();

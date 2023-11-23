@@ -11,7 +11,8 @@ export interface EmailFilter {
 }
 
 export interface EmailRepository {
+	send(email: Email): Promise<{ id: string }>;
+	create(email: Email): Promise<void>;
 	getAll(filters?: EmailFilter): Promise<Email[]>;
 	getOne(id: string): Promise<Email | null>;
-	create(email: Email): Promise<void>;
 }
