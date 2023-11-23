@@ -5,6 +5,7 @@
 	"main": "build/src/infra/http/index.js",
 	"scripts": {
 		"dev": "tsx -r dotenv/config --watch src/infra/http/index.ts",
+		"migrate": "npx prisma migrate deploy",
 		"build": "tsc",
 		"start": "node --env-file .env build/src/infra/http/index.js",
 		"test": "jest",
