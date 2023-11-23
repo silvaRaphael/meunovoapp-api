@@ -1,4 +1,4 @@
-import { AuthRepository } from "@repositories/auth-repository";
+import { AuthRepository } from "../../repositories/auth-repository";
 
 export class SignOutUseCase {
 	constructor(private authRepository: AuthRepository) {}

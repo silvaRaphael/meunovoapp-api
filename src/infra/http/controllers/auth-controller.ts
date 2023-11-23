@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
-import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { signInSchema, tokenSchema } from "src/application/adapters/auth";
-import { AuthRequest } from "@config/auth-request";
-import { HandleError } from "@utils/handle-error";
+import { HandleError } from "../utils/handle-error";
+import { SignOutUseCase } from "../../../application/use-cases/auth-use-case/sign-out-use-case";
+import { AuthRequest } from "../../config/auth-request";
+import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
+import { signInSchema, tokenSchema } from "../../../application/adapters/auth";
 
 export class AuthController {
 	constructor(

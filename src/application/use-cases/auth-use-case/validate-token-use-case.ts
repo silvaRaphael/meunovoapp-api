@@ -1,5 +1,5 @@
-import { User } from "@domain/user";
-import { AuthRepository } from "@repositories/auth-repository";
+import { User } from "@prisma/client";
+import { AuthRepository } from "../../repositories/auth-repository";
 
 export class ValidateTokenUseCase {
 	constructor(private authRepository: AuthRepository) {}

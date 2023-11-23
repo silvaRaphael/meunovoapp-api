@@ -1,4 +1,4 @@
-import { User } from "@domain/user";
+import { User } from "../../domain/user";
 
 export interface AuthRepository {
 	signIn(data: { id: string; token: string }): Promise<void>;

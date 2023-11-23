@@ -1,6 +1,9 @@
-import { PrismaType } from "@db/prisma";
-import { Email } from "@domain/email";
-import { EmailFilter, EmailRepository } from "@repositories/email-repository";
+import {
+	EmailFilter,
+	EmailRepository,
+} from "../../../application/repositories/email-repository";
+import { Email } from "../../../domain/email";
+import { PrismaType } from "../prisma";
 
 export class EmailRepositoryImpl implements EmailRepository {
 	constructor(private database: PrismaType) {}

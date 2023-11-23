@@ -1,6 +1,6 @@
-import { UserRepository } from "@repositories/user-repository";
-import { PrismaType } from "@db/prisma";
-import { User } from "@domain/user";
+import { UserRepository } from "../../../application/repositories/user-repository";
+import { User } from "../../../domain/user";
+import { PrismaType } from "../prisma";
 
 export class UserRepositoryImpl implements UserRepository {
 	constructor(private database: PrismaType) {}

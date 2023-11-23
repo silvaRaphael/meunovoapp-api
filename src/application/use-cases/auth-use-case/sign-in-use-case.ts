@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { compareSync } from "bcrypt";
-import { AuthRepository } from "@repositories/auth-repository";
-import { UserRepository } from "@repositories/user-repository";
-import { SignInSchema } from "@adapters/auth";
-import { User } from "@domain/user";
+import { AuthRepository } from "../../repositories/auth-repository";
+import { UserRepository } from "../../repositories/user-repository";
+import { SignInSchema } from "../../adapters/auth";
+import { User } from "@prisma/client";
 
 export class SignInUseCase {
 	constructor(

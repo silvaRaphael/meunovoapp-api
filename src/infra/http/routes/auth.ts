@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { prisma } from "@db/prisma";
-import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
-import { UserRepositoryImpl } from "@impl/user-repository-impl";
-import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
-import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { AuthController } from "@controllers/auth-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
+import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-impl";
+import { UserRepositoryImpl } from "../../database/repositories/user-repository-impl";
+import { prisma } from "../../database/prisma";
+import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
+import { SignOutUseCase } from "../../../application/use-cases/auth-use-case/sign-out-use-case";
+import { AuthController } from "../controllers/auth-controller";
 
 const routes = Router();
 

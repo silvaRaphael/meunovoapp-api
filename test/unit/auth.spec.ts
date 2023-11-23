@@ -1,14 +1,14 @@
-import { prisma } from "@db/prisma";
-import { UserRepository } from "@repositories/user-repository";
-import { UserRepositoryImpl } from "@impl/user-repository-impl";
-import { GetAllUsersUseCase } from "@use-cases/user-use-case/get-all-users-use-case";
-import { GetUserUseCase } from "@use-cases/user-use-case/get-user-use-case";
-import { GetUserByEmailUseCase } from "@use-cases/user-use-case/get-user-by-email-use-case";
-import { AuthRepository } from "@repositories/auth-repository";
-import { SignInUseCase } from "@use-cases/auth-use-case/sign-in-use-case";
-import { SignOutUseCase } from "@use-cases/auth-use-case/sign-out-use-case";
-import { AuthRepositoryImpl } from "@impl/auth-repository-impl";
-import { ValidateTokenUseCase } from "@use-cases/auth-use-case/validate-token-use-case";
+import { AuthRepository } from "../../src/application/repositories/auth-repository";
+import { UserRepository } from "../../src/application/repositories/user-repository";
+import { SignInUseCase } from "../../src/application/use-cases/auth-use-case/sign-in-use-case";
+import { SignOutUseCase } from "../../src/application/use-cases/auth-use-case/sign-out-use-case";
+import { ValidateTokenUseCase } from "../../src/application/use-cases/auth-use-case/validate-token-use-case";
+import { GetAllUsersUseCase } from "../../src/application/use-cases/user-use-case/get-all-users-use-case";
+import { GetUserByEmailUseCase } from "../../src/application/use-cases/user-use-case/get-user-by-email-use-case";
+import { GetUserUseCase } from "../../src/application/use-cases/user-use-case/get-user-use-case";
+import { prisma } from "../../src/infra/database/prisma";
+import { AuthRepositoryImpl } from "../../src/infra/database/repositories/auth-repository-impl";
+import { UserRepositoryImpl } from "../../src/infra/database/repositories/user-repository-impl";
 
 describe("Auth tests", () => {
 	let authRepository: AuthRepository;

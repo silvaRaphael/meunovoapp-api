@@ -1,7 +1,7 @@
-import { tokenSchema } from "src/application/adapters/auth";
-import { AuthRequest } from "@config/auth-request";
 import { NextFunction, Request, Response } from "express";
-import { HandleError } from "@utils/handle-error";
+import { HandleError } from "../utils/handle-error";
+import { tokenSchema } from "../../../application/adapters/auth";
+import { AuthRequest } from "../../config/auth-request";
 
 export const AuthMiddleware = async (
 	req: Request,

@@ -1,4 +1,4 @@
-import { Email } from "@domain/email";
+import { Email } from "../../domain/email";
 
 export interface EmailFilter {
 	name?: string;
