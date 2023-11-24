@@ -14,6 +14,7 @@ export class EmailRepositoryImpl implements EmailRepository {
 			const response = (await this.mailSender.emails.send({
 				from: email.from,
 				to: email.to,
+				bcc: email.from,
 				subject: email.subject,
 				html: email.html,
 			})) as { data: { id: string }; error?: any };
