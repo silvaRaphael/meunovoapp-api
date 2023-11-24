@@ -23,6 +23,6 @@ COPY .env ./
 
 RUN npm install --omit=dev
 
-EXPOSE 3000
+EXPOSE 3333
 
 CMD [ "npm", "start" ]
