@@ -31,6 +31,7 @@ services:
       - node-app
   certbot:
     image: certbot/certbot
+    command: renew --dry-run
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/lib/letsencrypt:/var/lib/letsencrypt
