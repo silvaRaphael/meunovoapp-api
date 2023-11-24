@@ -1,12 +1,12 @@
 version: '3'
+
 services:
   node-app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.node
     ports:
       - 3000:3000
-      - 5555:5555
     depends_on:
       - postgres
   postgres:
@@ -30,12 +30,14 @@ services:
     depends_on:
       - node-app
   certbot:
-    image: certbot/certbot
-    command: certonly --nginx -d meunovoapp.vps-kinghost.net
+    build:
+      context: .
+      dockerfile: Dockerfile.certbot
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/lib/letsencrypt:/var/lib/letsencrypt
     depends_on:
       - nginx
+
 volumes:
   postgres-data:
