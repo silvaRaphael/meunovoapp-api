@@ -30,7 +30,7 @@ export class AuthController {
 				res.status(200).json(response);
 			});
 		} catch (error: any) {
-			res.status(400).send({ error: HandleError(error) });
+			res.status(401).json({ error: HandleError(error) });
 		}
 	}
 
@@ -44,7 +44,7 @@ export class AuthController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(400).send({ error: HandleError(error) });
+			res.status(401).json({ error: HandleError(error) });
 		}
 	}
 }

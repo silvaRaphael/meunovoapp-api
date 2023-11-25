@@ -29,7 +29,7 @@ export class EmailController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(400).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error) });
 		}
 	}
 
@@ -49,7 +49,7 @@ export class EmailController {
 			res.status(200).json(response);
 		} catch (error: any) {
 			console.error(error);
-			res.status(400).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error) });
 		}
 	}
 
@@ -61,7 +61,7 @@ export class EmailController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(400).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error) });
 		}
 	}
 }
