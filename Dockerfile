@@ -1,8 +1,8 @@
 FROM node:lts-alpine as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package.*json ./
+COPY package*.json ./
 
 RUN npm install
 
@@ -12,17 +12,21 @@ RUN npx prisma generate
 
 RUN npm run build
 
-FROM node:lts-alpine
+FROM node:lts-alpine as production
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY --from=builder /usr/src/app/build ./build
+COPY --from=builder /app/build ./build
 COPY package*.json ./
 COPY prisma ./
 COPY .env ./
 
 RUN npm install --omit=dev
 
+CMD ["npm", "start"]
+
+FROM builder as dev
+
 EXPOSE 3333
 
-CMD [ "npm", "start" ]
+CMD ["npm", "run", "dev"]

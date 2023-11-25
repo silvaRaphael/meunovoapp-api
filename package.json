@@ -4,10 +4,10 @@
 	"description": "",
 	"main": "build/src/infra/http/index.js",
 	"scripts": {
-		"dev": "tsx -r dotenv/config --watch src/infra/http/index.ts",
+		"dev": "npx prisma migrate dev && tsx -r dotenv/config --watch src/infra/http/index.ts",
 		"migrate": "npx prisma migrate deploy",
 		"build": "tsc",
-		"start": "npx prisma migrate dev && node --env-file .env build/src/infra/http/index.js",
+		"start": "npx prisma migrate deploy && node --env-file .env build/src/infra/http/index.js",
 		"test": "jest",
 		"test:unit": "jest test/unit"
 	},
@@ -22,6 +22,7 @@
 		"express-session": "^1.17.3",
 		"prisma": "^5.6.0",
 		"resend": "^2.0.0",
+		"ts-node-dev": "^2.0.0",
 		"zod": "^3.22.4"
 	},
 	"devDependencies": {
