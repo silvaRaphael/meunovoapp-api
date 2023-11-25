@@ -22,7 +22,7 @@ const emailController = new EmailController(
 	getEmailUseCase,
 );
 
-routes.post("/send", (req, res) => {
+routes.post("/", (req, res) => {
 	emailController.sendEmail(req, res);
 });
 

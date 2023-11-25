@@ -6,13 +6,9 @@ export const emailSchema = z.object({
 			required_error: "Nome é necessário.",
 		})
 		.max(50, { message: "O nome deve ter ao máximo 20 digitos." }),
-	from: z
-		.string({
-			required_error: "E-mail é necessário.",
-		})
-		.email({
-			message: "E-mail válido é necessário.",
-		}),
+	from: z.string({
+		required_error: "E-mail é necessário.",
+	}),
 	to: z.array(
 		z
 			.string({

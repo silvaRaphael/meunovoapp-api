@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { HandleError } from "../utils/handle-error";
 import { tokenSchema } from "../../../application/adapters/auth";
 import { AuthRequest } from "../../config/auth-request";
+import { ValidateTokenUseCase } from "../../../application/use-cases/auth-use-case/validate-token-use-case";
+import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-impl";
+import { prisma } from "../../database/prisma";
 
 export const AuthMiddleware = async (
 	req: Request,
@@ -19,12 +22,13 @@ export const AuthMiddleware = async (
 
 		const parsedToken = tokenSchema.parse(token);
 
-		if (!(req.session as any).user || !(req.session as any).user.token)
-			throw new Error("Token expirado.");
+		const response = await new ValidateTokenUseCase(
+			new AuthRepositoryImpl(prisma),
+		).execute(parsedToken);
 
-		const response = (req.session as any).user;
+		if (!response) throw new Error("Token expirado.");
 
-		if (response.token !== token) throw new Error("Token expirado.");
+		if (response?.token !== token) throw new Error("Token expirado.");
 
 		(req as AuthRequest).token = parsedToken;
 		(req as AuthRequest).userEmail = response.email;

@@ -21,14 +21,8 @@ export class AuthController {
 			});
 
 			(response as any).id = undefined;
-			(response as any).password = undefined;
 
-			(req.session as any).user = response;
-
-			req.session.save((error: any) => {
-				if (error) throw error;
-				res.status(200).json(response);
-			});
+			res.status(200).json(response);
 		} catch (error: any) {
 			res.status(401).json({ error: HandleError(error) });
 		}
@@ -39,8 +33,6 @@ export class AuthController {
 			const token = tokenSchema.parse((req as AuthRequest).token);
 
 			await this.signOutUseCase.execute(token);
-
-			req.session.destroy(() => {});
 
 			res.status(200).send();
 		} catch (error: any) {
