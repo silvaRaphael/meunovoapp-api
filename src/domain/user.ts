@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { hashSync } from "bcrypt";
 
-export type Roles = "admin" | "client";
+export type Roles = "master" | "admin" | "client";
 
 export interface IUser {
 	id?: string;
@@ -20,11 +20,14 @@ export class User {
 	role: Roles;
 	token: string | null;
 
-	constructor({ id, name, email, password, role, token }: IUser) {
+	constructor(
+		{ id, name, email, password, role, token }: IUser,
+		autoHashPassword: boolean = true,
+	) {
 		this.id = id || randomUUID();
 		this.name = name;
 		this.email = email;
-		this.password = hashSync(password, 8);
+		this.password = autoHashPassword ? hashSync(password, 8) : password;
 		this.role = role;
 		this.token = token || null;
 	}
