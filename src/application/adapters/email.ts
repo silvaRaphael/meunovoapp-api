@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const emailSchema = z.object({
+export const sendEmailSchema = z.object({
 	name: z
 		.string({
 			required_error: "Nome é necessário.",
@@ -27,4 +27,15 @@ export const emailSchema = z.object({
 		required_error: "Html é necessário.",
 	}),
 });
-export type EmailSchema = z.infer<typeof emailSchema>;
+export type SendEmailSchema = z.infer<typeof sendEmailSchema>;
+
+export const replyEmailSchema = z.object({
+	id: z
+		.string({
+			required_error: "ID é necessário.",
+		})
+		.uuid({
+			message: "Id válido é necessário.",
+		}),
+});
+export type ReplyEmailSchema = z.infer<typeof replyEmailSchema>;

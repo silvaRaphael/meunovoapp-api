@@ -42,6 +42,23 @@ export class EmailRepositoryImpl implements EmailRepository {
 		}
 	}
 
+	async update(id: string): Promise<void> {
+		try {
+			const response = await this.database.email.update({
+				where: {
+					id,
+				},
+				data: {
+					replyed: true,
+				},
+			});
+
+			if (!response) throw Error;
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
+
 	async getAll(filters?: EmailFilter): Promise<Email[]> {
 		try {
 			let filter: any = {};

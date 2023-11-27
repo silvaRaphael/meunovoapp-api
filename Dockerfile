@@ -17,9 +17,10 @@ FROM node:lts-alpine as production
 WORKDIR /app
 
 COPY --from=builder /app/build ./build
-COPY package*.json ./
-COPY prisma ./
-COPY .env ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma 
+COPY --from=builder /app/.env ./
+COPY --from=builder /app/package*.json ./
 
 RUN npm install --omit=dev
 

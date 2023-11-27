@@ -4,12 +4,12 @@
 	"description": "",
 	"main": "build/src/infra/http/index.js",
 	"scripts": {
-		"dev": "npx prisma migrate dev && npm run seed:dev && tsx -r dotenv/config --watch src/infra/http/index.ts",
-		"migrate": "npx prisma migrate deploy",
+		"dev": "npx prisma migrate dev --name init && npm run seed:dev && ts-node-dev --poll --respawn --transpile-only -r dotenv/config src/infra/http/index.ts",
 		"seed:dev": "tsx src/infra/database/seed.ts",
 		"seed:build": "node build/src/infra/database/seed.js",
 		"build": "tsc",
-		"start": "npx prisma migrate deploy && npm run seed:build && node --env-file .env build/src/infra/http/index.js",
+		"pre:start": "npx prisma migrate deploy && npm run seed:build",
+		"start": "node --env-file .env build/src/infra/http/index.js",
 		"test": "jest",
 		"test:unit": "jest test/unit"
 	},

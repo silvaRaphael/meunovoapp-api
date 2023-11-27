@@ -1,7 +1,8 @@
-import { EmailSchema } from "../../src/application/adapters/email";
+import { SendEmailSchema } from "../../src/application/adapters/email";
 import { EmailRepository } from "../../src/application/repositories/email-repository";
 import { GetAllEmailsUseCase } from "../../src/application/use-cases/email-use-case/get-all-emails-use-case";
 import { GetEmailUseCase } from "../../src/application/use-cases/email-use-case/get-email-use-case";
+import { ReplyEmailUseCase } from "../../src/application/use-cases/email-use-case/reply-email-use-case";
 import { SendEmailUseCase } from "../../src/application/use-cases/email-use-case/send-email-use-case";
 import { prisma } from "../../src/infra/database/prisma";
 import { EmailRepositoryImpl } from "../../src/infra/database/repositories/email-repository-impl";
@@ -11,10 +12,11 @@ describe("Email tests", () => {
 	let emailRepository: EmailRepository;
 
 	let sendEmailUseCase: SendEmailUseCase;
+	let replyEmailUseCase: ReplyEmailUseCase;
 	let getAllEmailsUseCase: GetAllEmailsUseCase;
 	let getEmailUseCase: GetEmailUseCase;
 
-	let emailToSend: EmailSchema = {
+	let emailToSend: SendEmailSchema = {
 		name: "Raphael",
 		from: process.env.EMAIL_SENDER || "",
 		to: [process.env.EMAIL_RECEIVER || ""],
@@ -26,12 +28,24 @@ describe("Email tests", () => {
 		emailRepository = new EmailRepositoryImpl(prisma, resend);
 
 		sendEmailUseCase = new SendEmailUseCase(emailRepository);
+		replyEmailUseCase = new ReplyEmailUseCase(emailRepository);
 		getAllEmailsUseCase = new GetAllEmailsUseCase(emailRepository);
 		getEmailUseCase = new GetEmailUseCase(emailRepository);
 	});
 
 	it("should send email", async () => {
 		expect(await sendEmailUseCase.execute(emailToSend)).toBeUndefined();
+	});
+
+	it("should reply email by id", async () => {
+		expect(
+			await Promise.all([
+				replyEmailUseCase.execute(
+					"80dd6b1a-b4f9-475f-9e8d-d2e0eb027515",
+				),
+				sendEmailUseCase.execute(emailToSend),
+			]),
+		).toBeInstanceOf(Array);
 	});
 
 	it("should get all emails", async () => {

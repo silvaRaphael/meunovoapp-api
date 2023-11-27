@@ -13,7 +13,7 @@ app.use("/v1/api", routes);
 
 app.get("/", (_, res) =>
 	res.send(
-		`API is ok on <a href="${process.env.SITE_URI}/v1/api">${process.env.SITE_URI}/v1/api</a>`,
+		`API is on <a href="${process.env.SITE_URI}/v1/api">${process.env.SITE_URI}/v1/api</a>`,
 	),
 );
 

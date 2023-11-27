@@ -1,21 +1,26 @@
 import { Request, Response } from "express";
-import { emailSchema } from "../../../application/adapters/email";
+import {
+	replyEmailSchema,
+	sendEmailSchema,
+} from "../../../application/adapters/email";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 import { HandleError } from "../utils/handle-error";
 import { GetAllEmailsUseCase } from "../../../application/use-cases/email-use-case/get-all-emails-use-case";
 import { AuthRequest } from "../../config/auth-request";
 import { GetEmailUseCase } from "../../../application/use-cases/email-use-case/get-email-use-case";
+import { ReplyEmailUseCase } from "../../../application/use-cases/email-use-case/reply-email-use-case";
 
 export class EmailController {
 	constructor(
 		private sendEmailUseCase: SendEmailUseCase,
+		private replyEmailUseCase: ReplyEmailUseCase,
 		private getAllEmailsUseCase: GetAllEmailsUseCase,
 		private getEmailUseCase: GetEmailUseCase,
 	) {}
 
 	async sendEmail(req: Request, res: Response) {
 		try {
-			const { name, from, to, subject, html } = emailSchema.parse(
+			const { name, from, to, subject, html } = sendEmailSchema.parse(
 				req.body,
 			);
 
@@ -26,6 +31,30 @@ export class EmailController {
 				subject,
 				html,
 			});
+
+			res.status(200).send();
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
+	async replyEmail(req: Request, res: Response) {
+		try {
+			const { id } = replyEmailSchema.parse(req.params);
+			const { name, from, to, subject, html } = sendEmailSchema.parse(
+				req.body,
+			);
+
+			await Promise.all([
+				this.replyEmailUseCase.execute(id),
+				this.sendEmailUseCase.execute({
+					name,
+					from,
+					to,
+					subject,
+					html,
+				}),
+			]);
 
 			res.status(200).send();
 		} catch (error: any) {

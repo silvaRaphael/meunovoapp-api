@@ -1,11 +1,11 @@
 import { Email } from "../../../domain/email";
-import { EmailSchema } from "../../adapters/email";
+import { SendEmailSchema } from "../../adapters/email";
 import { EmailRepository } from "../../repositories/email-repository";
 
 export class SendEmailUseCase {
 	constructor(private emailRepository: EmailRepository) {}
 
-	async execute(email: EmailSchema): Promise<void> {
+	async execute(email: SendEmailSchema): Promise<void> {
 		try {
 			const emailToSend = new Email(email);
 
