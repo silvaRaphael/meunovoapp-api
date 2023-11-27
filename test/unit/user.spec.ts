@@ -28,10 +28,10 @@ describe("User tests", () => {
 
 	it("should get one user by id", async () => {
 		const response = await getUserUseCase.execute(
-			"3aeca3f9-584f-458c-8af5-a100f0ab6485",
+			"6e161850-e0bf-4a13-8417-212dd796be2a",
 		);
 
-		expect(response?.role).toBe("admin");
+		expect(response?.role).toBe("master");
 	});
 
 	it("should get one user by email", async () => {
@@ -39,6 +39,6 @@ describe("User tests", () => {
 			"raphaeltiago02@gmail.com",
 		);
 
-		expect(response?.id).toBe("3aeca3f9-584f-458c-8af5-a100f0ab6485");
+		expect(response?.id).toBe("6e161850-e0bf-4a13-8417-212dd796be2a");
 	});
 });

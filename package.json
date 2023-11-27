@@ -10,6 +10,7 @@
 		"build": "tsc",
 		"pre:start": "npx prisma migrate deploy && npm run seed:build",
 		"start": "node --env-file .env build/src/infra/http/index.js",
+		"pg-host": "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' meunovoapp-api-postgres-1",
 		"test": "jest",
 		"test:unit": "jest test/unit"
 	},

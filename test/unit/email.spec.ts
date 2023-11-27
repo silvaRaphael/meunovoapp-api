@@ -41,7 +41,7 @@ describe("Email tests", () => {
 		expect(
 			await Promise.all([
 				replyEmailUseCase.execute(
-					"80dd6b1a-b4f9-475f-9e8d-d2e0eb027515",
+					"41660587-f260-478c-b82d-7c56acf75b41",
 				),
 				sendEmailUseCase.execute(emailToSend),
 			]),

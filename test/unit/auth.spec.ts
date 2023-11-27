@@ -42,7 +42,7 @@ describe("Auth tests", () => {
 	it("should sign in with email and password", async () => {
 		const response = await signInUseCase.execute({
 			email: "raphaeltiago02@gmail.com",
-			password: "MNapp2023",
+			password: "MNapp2023@",
 		});
 
 		token = response.token || "";
