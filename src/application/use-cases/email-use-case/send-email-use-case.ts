@@ -13,8 +13,6 @@ export class SendEmailUseCase {
 
 			if (!response) throw Error;
 
-			emailToSend.setID(response.id);
-
 			this.emailRepository.create(emailToSend);
 		} catch (error: any) {
 			throw error;

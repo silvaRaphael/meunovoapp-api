@@ -7,7 +7,8 @@ export interface IEmail {
 	to: string[];
 	subject: string;
 	html: string;
-	replyed?: boolean;
+	replyed?: string;
+	has_reply?: boolean;
 	created_at?: Date;
 }
 
@@ -18,7 +19,8 @@ export class Email {
 	to: string[];
 	subject: string;
 	html: string;
-	replyed: boolean;
+	replyed?: string;
+	has_reply: boolean;
 	created_at: Date;
 
 	constructor({
@@ -29,6 +31,7 @@ export class Email {
 		subject,
 		html,
 		replyed,
+		has_reply,
 		created_at,
 	}: IEmail) {
 		this.id = id || randomUUID();
@@ -37,11 +40,8 @@ export class Email {
 		this.to = to;
 		this.subject = subject;
 		this.html = html;
-		this.replyed = replyed || false;
+		this.replyed = replyed;
+		this.has_reply = has_reply || false;
 		this.created_at = created_at || new Date();
-	}
-
-	setID(id: string) {
-		this.id = id;
 	}
 }

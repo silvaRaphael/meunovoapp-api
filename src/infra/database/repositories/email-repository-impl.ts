@@ -3,26 +3,25 @@ import {
 	EmailRepository,
 } from "../../../application/repositories/email-repository";
 import { Email } from "../../../domain/email";
-import { ResendType } from "../../providers/resend";
+import { MailSender } from "../../providers/nodemailer";
 import { PrismaType } from "../prisma";
 
 export class EmailRepositoryImpl implements EmailRepository {
-	constructor(private database: PrismaType, private mailSender: ResendType) {}
+	constructor(private database: PrismaType, private mailSender: MailSender) {}
 
 	async send(email: Email): Promise<{ id: string }> {
 		try {
-			const response = (await this.mailSender.emails.send({
+			const response = await this.mailSender.sendMail({
 				from: email.from,
 				to: email.to,
 				bcc: email.from,
 				subject: email.subject,
 				html: email.html,
-			})) as { data: { id: string }; error?: any };
+			});
 
-			if (!response || response.error)
-				throw !response ? Error : new Error(response.error.message);
+			if (!response) throw Error;
 
-			return { id: response.data.id };
+			return { id: response.messageId };
 		} catch (error: any) {
 			throw error;
 		}
@@ -38,22 +37,21 @@ export class EmailRepositoryImpl implements EmailRepository {
 
 			if (!response) throw Error;
 		} catch (error: any) {
+			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}
 
 	async update(id: string): Promise<void> {
 		try {
-			const response = await this.database.email.update({
+			await this.database.email.update({
 				where: {
 					id,
 				},
 				data: {
-					replyed: true,
+					has_reply: true,
 				},
 			});
-
-			if (!response) throw Error;
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
@@ -62,14 +60,14 @@ export class EmailRepositoryImpl implements EmailRepository {
 	async getAll(filters?: EmailFilter): Promise<Email[]> {
 		try {
 			let filter: any = {};
+			filter.where = {
+				replyed: undefined || null,
+			};
 
 			if (filters) {
 				const { name, to, from, subject, html, created_at, limit } =
 					filters;
 				const OR: any = [];
-
-				if (name || to || from || subject || html || created_at)
-					filter.where = {};
 
 				if (name) filter.where.name = { contains: name };
 				if (to) OR.push({ to: { has: to } });
@@ -81,7 +79,12 @@ export class EmailRepositoryImpl implements EmailRepository {
 				if (limit) filter.take = limit;
 			}
 
-			const response = await this.database.email.findMany(filter);
+			const response = await this.database.email.findMany({
+				...filter,
+				orderBy: {
+					created_at: "desc",
+				},
+			});
 
 			if (!response) return [];
 

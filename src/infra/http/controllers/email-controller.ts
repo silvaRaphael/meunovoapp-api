@@ -40,21 +40,19 @@ export class EmailController {
 
 	async replyEmail(req: Request, res: Response) {
 		try {
-			const { id } = replyEmailSchema.parse(req.params);
+			const { replyed } = replyEmailSchema.parse(req.params);
 			const { name, from, to, subject, html } = sendEmailSchema.parse(
 				req.body,
 			);
 
-			await Promise.all([
-				this.replyEmailUseCase.execute(id),
-				this.sendEmailUseCase.execute({
-					name,
-					from,
-					to,
-					subject,
-					html,
-				}),
-			]);
+			await this.replyEmailUseCase.execute({
+				name,
+				from,
+				to,
+				subject,
+				html,
+				replyed,
+			});
 
 			res.status(200).send();
 		} catch (error: any) {

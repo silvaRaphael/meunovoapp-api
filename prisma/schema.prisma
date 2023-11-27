@@ -23,6 +23,7 @@ model Email {
   to String[]
   subject String
   html     String
-  replyed Boolean?
+  replyed String?
+  has_reply Boolean?
   created_at DateTime
 }

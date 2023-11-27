@@ -6,7 +6,7 @@ import { ReplyEmailUseCase } from "../../src/application/use-cases/email-use-cas
 import { SendEmailUseCase } from "../../src/application/use-cases/email-use-case/send-email-use-case";
 import { prisma } from "../../src/infra/database/prisma";
 import { EmailRepositoryImpl } from "../../src/infra/database/repositories/email-repository-impl";
-import { resend } from "../../src/infra/providers/resend";
+import { mailSender } from "../../src/infra/providers/nodemailer";
 
 describe("Email tests", () => {
 	let emailRepository: EmailRepository;
@@ -25,7 +25,7 @@ describe("Email tests", () => {
 	};
 
 	beforeAll(() => {
-		emailRepository = new EmailRepositoryImpl(prisma, resend);
+		emailRepository = new EmailRepositoryImpl(prisma, mailSender);
 
 		sendEmailUseCase = new SendEmailUseCase(emailRepository);
 		replyEmailUseCase = new ReplyEmailUseCase(emailRepository);
@@ -39,13 +39,11 @@ describe("Email tests", () => {
 
 	it("should reply email by id", async () => {
 		expect(
-			await Promise.all([
-				replyEmailUseCase.execute(
-					"41660587-f260-478c-b82d-7c56acf75b41",
-				),
-				sendEmailUseCase.execute(emailToSend),
-			]),
-		).toBeInstanceOf(Array);
+			await replyEmailUseCase.execute({
+				...emailToSend,
+				replyed: "41660587-f260-478c-b82d-7c56acf75b41",
+			}),
+		).toBeUndefined();
 	});
 
 	it("should get all emails", async () => {

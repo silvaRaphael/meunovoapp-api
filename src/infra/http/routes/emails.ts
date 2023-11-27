@@ -2,7 +2,7 @@ import { Router } from "express";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
 import { prisma } from "../../database/prisma";
-import { resend } from "../../providers/resend";
+import { mailSender } from "../../providers/nodemailer";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 import { GetAllEmailsUseCase } from "../../../application/use-cases/email-use-case/get-all-emails-use-case";
 import { GetEmailUseCase } from "../../../application/use-cases/email-use-case/get-email-use-case";
@@ -11,7 +11,7 @@ import { ReplyEmailUseCase } from "../../../application/use-cases/email-use-case
 
 const routes = Router();
 
-const emailRepository = new EmailRepositoryImpl(prisma, resend);
+const emailRepository = new EmailRepositoryImpl(prisma, mailSender);
 
 const sendEmailUseCase = new SendEmailUseCase(emailRepository);
 const replyEmailUseCase = new ReplyEmailUseCase(emailRepository);
@@ -29,7 +29,7 @@ routes.post("/", (req, res) => {
 	emailController.sendEmail(req, res);
 });
 
-routes.post("/:id", AuthMiddleware, (req, res) => {
+routes.post("/:replyed", AuthMiddleware, (req, res) => {
 	emailController.replyEmail(req, res);
 });
 

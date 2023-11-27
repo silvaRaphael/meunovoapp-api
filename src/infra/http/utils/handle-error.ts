@@ -7,6 +7,7 @@ export const HandleError = (error: any) => {
 		return [
 			{
 				message: error.message,
+				path: error.path,
 			},
 		];
 

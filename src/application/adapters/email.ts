@@ -30,7 +30,7 @@ export const sendEmailSchema = z.object({
 export type SendEmailSchema = z.infer<typeof sendEmailSchema>;
 
 export const replyEmailSchema = z.object({
-	id: z
+	replyed: z
 		.string({
 			required_error: "ID é necessário.",
 		})

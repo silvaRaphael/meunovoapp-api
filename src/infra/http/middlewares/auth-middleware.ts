@@ -36,6 +36,6 @@ export const AuthMiddleware = async (
 
 		next();
 	} catch (error: any) {
-		res.status(400).send({ error: HandleError(error) });
+		res.status(401).send({ error: HandleError(error) });
 	}
 };
