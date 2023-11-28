@@ -40,6 +40,9 @@ export class ClientRepositoryImpl implements ClientRepository {
 					company: true,
 					logotipo: true,
 					users: {
+						where: {
+							is_manager: true,
+						},
 						select: {
 							name: true,
 							email: true,
@@ -61,6 +64,18 @@ export class ClientRepositoryImpl implements ClientRepository {
 			const response = await this.database.client.findFirst({
 				where: {
 					id,
+				},
+				select: {
+					id: true,
+					company: true,
+					logotipo: true,
+					users: {
+						select: {
+							name: true,
+							email: true,
+							is_manager: true,
+						},
+					},
 				},
 			});
 

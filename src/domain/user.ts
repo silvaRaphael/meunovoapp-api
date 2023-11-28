@@ -10,6 +10,7 @@ export interface IUser {
 	password?: string;
 	role: Roles;
 	client_id?: string;
+	is_manager?: boolean;
 	token?: string;
 }
 
@@ -20,10 +21,20 @@ export class User {
 	password: string | null;
 	role: Roles;
 	client_id: string | null;
+	is_manager: boolean;
 	token: string | null;
 
 	constructor(
-		{ id, name, email, password, role, client_id, token }: IUser,
+		{
+			id,
+			name,
+			email,
+			password,
+			role,
+			client_id,
+			is_manager,
+			token,
+		}: IUser,
 		autoHashPassword: boolean = true,
 	) {
 		this.id = id || randomUUID();
@@ -36,6 +47,7 @@ export class User {
 			: null;
 		this.role = role;
 		this.client_id = client_id || null;
+		this.is_manager = is_manager || false;
 		this.token = token || null;
 	}
 }

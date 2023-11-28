@@ -21,8 +21,8 @@ export const signInSchema = z.object({
 		.string({
 			required_error: "Senha é necessária.",
 		})
-		.min(6, {
-			message: "A senha deve ter ao menos 6 digitos.",
+		.min(5, {
+			message: "A senha deve ter ao menos 5 digitos.",
 		})
 		.max(20, { message: "A senha deve ter ao máximo 20 digitos." }),
 });

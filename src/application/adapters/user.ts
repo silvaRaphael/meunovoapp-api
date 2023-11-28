@@ -13,10 +13,11 @@ export const createUserSchema = z.object({
 		.uuid({
 			message: "ID válido é necessário.",
 		}),
+	is_manager: z.boolean().optional(),
 });
 export type CreateUserSchema = z.infer<typeof createUserSchema>;
 
-export const updateUserSchema = z.object({
+export const completeUserSchema = z.object({
 	name: z
 		.string({
 			required_error: "Nome é necessário.",
@@ -33,4 +34,32 @@ export const updateUserSchema = z.object({
 		})
 		.max(20, { message: "A senha deve ter ao máximo 20 digitos." }),
 });
+export type CompleteUserSchema = z.infer<typeof completeUserSchema>;
+
+export const updateUserSchema = z
+	.object({
+		name: z
+			.string({
+				required_error: "Nome é necessário.",
+			})
+			.max(50, { message: "O nome deve ter ao máximo 50 digitos." }),
+		email: z
+			.string({
+				required_error: "E-mail é necessário.",
+			})
+			.email({ message: "Digite um e-mail válido" }),
+		old_password: z
+			.string({ required_error: "Senha antiga é necessária." })
+			.min(5, { message: "Digite uma senha maior." })
+			.max(20, { message: "Digite uma senha menor." })
+			.optional(),
+		password: z
+			.string({ required_error: "Nova senha é necessária." })
+			.min(5, { message: "Digite uma senha maior." })
+			.max(20, { message: "Digite uma senha menor." })
+			.optional(),
+	})
+	.refine((data) => !data.password || (data.old_password && data.password), {
+		message: "Digite sua senha antiga.",
+	});
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;

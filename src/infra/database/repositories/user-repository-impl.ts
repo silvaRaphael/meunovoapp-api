@@ -13,7 +13,6 @@ export class UserRepositoryImpl implements UserRepository {
 				},
 			});
 		} catch (error: any) {
-			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}

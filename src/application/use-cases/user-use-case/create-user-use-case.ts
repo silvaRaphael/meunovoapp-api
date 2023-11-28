@@ -8,6 +8,7 @@ export class CreateUserUseCase {
 	async execute({
 		email,
 		client_id,
+		is_manager,
 	}: CreateUserSchema): Promise<{ id: string }> {
 		try {
 			const existentUser = await this.userRepository.getOneByEmail(email);
@@ -18,6 +19,7 @@ export class CreateUserUseCase {
 				email,
 				client_id,
 				role: "client",
+				is_manager,
 			});
 
 			await this.userRepository.create(userToCreate);
