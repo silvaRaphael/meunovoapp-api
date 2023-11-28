@@ -7,7 +7,7 @@ export class UserRepositoryImpl implements UserRepository {
 
 	async getAll(): Promise<User[]> {
 		try {
-			const response = await this.database.user.findMany({});
+			const response = await this.database.user.findMany();
 
 			if (!response) return [];
 

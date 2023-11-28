@@ -5,7 +5,7 @@ export const sendEmailSchema = z.object({
 		.string({
 			required_error: "Nome é necessário.",
 		})
-		.max(50, { message: "O nome deve ter ao máximo 20 digitos." }),
+		.max(50, { message: "O nome deve ter ao máximo 50 digitos." }),
 	from: z.string({
 		required_error: "E-mail é necessário.",
 	}),

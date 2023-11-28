@@ -13,7 +13,11 @@ model User {
   email    String @unique
   password String
   role     String
+  client_id String?
+  is_manager Boolean?
   token    String?
+
+  client Client? @relation(fields: [client_id], references: [id])
 }
 
 model Email {
@@ -26,4 +30,11 @@ model Email {
   replyed String?
   has_reply Boolean?
   created_at DateTime
+}
+
+model Client {
+  id String @id @unique
+  company String
+  logotipo String?
+  users User[]
 }

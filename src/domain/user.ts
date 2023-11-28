@@ -9,6 +9,7 @@ export interface IUser {
 	email: string;
 	password: string;
 	role: Roles;
+	client_id?: string;
 	token?: string;
 }
 
@@ -18,10 +19,11 @@ export class User {
 	email: string;
 	password: string;
 	role: Roles;
+	client_id: string | null;
 	token: string | null;
 
 	constructor(
-		{ id, name, email, password, role, token }: IUser,
+		{ id, name, email, password, role, client_id, token }: IUser,
 		autoHashPassword: boolean = true,
 	) {
 		this.id = id || randomUUID();
@@ -29,6 +31,7 @@ export class User {
 		this.email = email;
 		this.password = autoHashPassword ? hashSync(password, 8) : password;
 		this.role = role;
+		this.client_id = client_id || null;
 		this.token = token || null;
 	}
 }
