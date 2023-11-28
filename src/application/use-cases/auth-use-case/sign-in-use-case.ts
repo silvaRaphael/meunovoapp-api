@@ -16,6 +16,7 @@ export class SignInUseCase {
 			const response = await this.userRepository.getOneByEmail(email);
 
 			if (!response) throw new Error("E-mail não encontrado.");
+			if (!response.password) throw new Error("Conta não ativada.");
 
 			if (!compareSync(password, response.password))
 				throw new Error("Senha incorreta.");

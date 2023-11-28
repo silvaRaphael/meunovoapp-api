@@ -13,7 +13,7 @@ export class SendEmailUseCase {
 
 			if (!response) throw Error;
 
-			this.emailRepository.create(emailToSend);
+			if (!email.no_save) this.emailRepository.create(emailToSend);
 		} catch (error: any) {
 			throw error;
 		}

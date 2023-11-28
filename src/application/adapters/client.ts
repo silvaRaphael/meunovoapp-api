@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createClientSchema = z.object({
 	company: z
 		.string({
-			required_error: "Empresa é necessário.",
+			required_error: "Empresa é necessária.",
 		})
 		.max(50, { message: "A empresa deve ter ao máximo 50 digitos." }),
 	logotipo: z.string().optional(),

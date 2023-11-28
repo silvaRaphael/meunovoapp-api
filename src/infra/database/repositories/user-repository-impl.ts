@@ -5,6 +5,34 @@ import { PrismaType } from "../prisma";
 export class UserRepositoryImpl implements UserRepository {
 	constructor(private database: PrismaType) {}
 
+	async create(user: User): Promise<void> {
+		try {
+			await this.database.user.create({
+				data: {
+					...user,
+				},
+			});
+		} catch (error: any) {
+			console.error(error);
+			throw new Error("DB Error.");
+		}
+	}
+
+	async update(user: User): Promise<void> {
+		try {
+			await this.database.user.update({
+				data: {
+					...user,
+				},
+				where: {
+					id: user.id,
+				},
+			});
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
+
 	async getAll(): Promise<User[]> {
 		try {
 			const response = await this.database.user.findMany();
@@ -38,6 +66,9 @@ export class UserRepositoryImpl implements UserRepository {
 			const response = await this.database.user.findFirst({
 				where: {
 					email,
+					password: {
+						not: null,
+					},
 				},
 			});
 

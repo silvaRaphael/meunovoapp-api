@@ -9,9 +9,9 @@ datasource db {
 
 model User {
   id       String @id @unique
-  name     String
+  name     String?
   email    String @unique
-  password String
+  password String?
   role     String
   client_id String?
   is_manager Boolean?

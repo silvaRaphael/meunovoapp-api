@@ -26,6 +26,7 @@ export const sendEmailSchema = z.object({
 	html: z.string({
 		required_error: "Html é necessário.",
 	}),
+	no_save: z.boolean().optional(),
 });
 export type SendEmailSchema = z.infer<typeof sendEmailSchema>;
 

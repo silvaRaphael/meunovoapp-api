@@ -40,9 +40,6 @@ export class ClientRepositoryImpl implements ClientRepository {
 					company: true,
 					logotipo: true,
 					users: {
-						where: {
-							is_manager: true,
-						},
 						select: {
 							name: true,
 							email: true,

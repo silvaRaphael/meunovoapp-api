@@ -20,9 +20,8 @@ export class EmailController {
 
 	async sendEmail(req: Request, res: Response) {
 		try {
-			const { name, from, to, subject, html } = sendEmailSchema.parse(
-				req.body,
-			);
+			const { name, from, to, subject, html, no_save } =
+				sendEmailSchema.parse(req.body);
 
 			await this.sendEmailUseCase.execute({
 				name,
@@ -30,6 +29,7 @@ export class EmailController {
 				to,
 				subject,
 				html,
+				no_save,
 			});
 
 			res.status(200).send();
