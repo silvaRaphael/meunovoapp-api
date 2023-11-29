@@ -36,5 +36,29 @@ model Client {
   id String @id @unique
   company String
   logotipo String?
+
   users User[]
+  project Project[]
+}
+
+model Project {
+  id String @id @unique
+  client_id String?
+	name String
+	description String?
+	status String?
+	due DateTime
+
+  tasks Task[]
+  client Client? @relation(fields: [client_id], references: [id])
+}
+
+model Task {
+  id String @id @unique
+  project_id String?
+	name String
+	description String?
+	status String?
+
+  project Project? @relation(fields: [project_id], references: [id])
 }
