@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { projectStatuses } from "../../domain/project";
 
 export const createProjectSchema = z.object({
 	client_id: z
@@ -25,7 +24,7 @@ export const createProjectSchema = z.object({
 			required_error: "Status é necessário.",
 		})
 		.optional(),
-	due: z.date({
+	due: z.coerce.date({
 		required_error: "Prazo é necessário.",
 	}),
 });

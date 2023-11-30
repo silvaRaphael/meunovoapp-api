@@ -76,6 +76,15 @@ export class ClientRepositoryImpl implements ClientRepository {
 							is_manager: true,
 						},
 					},
+					projects: {
+						select: {
+							id: true,
+							name: true,
+							status: true,
+							tasks: true,
+							due: true,
+						},
+					},
 				},
 			});
 

@@ -36,21 +36,24 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 		try {
 			const response = await this.database.project.findMany({
 				select: {
+					id: true,
+					name: true,
+					status: true,
+					due: true,
 					client: {
 						select: {
 							company: true,
 							logotipo: true,
 						},
 					},
-					id: true,
-					name: true,
-					status: true,
-					due: true,
 					tasks: {
 						select: {
 							status: true,
 						},
 					},
+				},
+				orderBy: {
+					due: "asc",
 				},
 			});
 
@@ -68,6 +71,25 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 			const response = await this.database.project.findFirst({
 				where: {
 					id,
+				},
+				select: {
+					id: true,
+					name: true,
+					status: true,
+					due: true,
+					description: true,
+					client: {
+						select: {
+							id: true,
+						},
+					},
+					tasks: {
+						select: {
+							id: true,
+							name: true,
+							status: true,
+						},
+					},
 				},
 			});
 
