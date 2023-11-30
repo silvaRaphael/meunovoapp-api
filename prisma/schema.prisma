@@ -36,6 +36,8 @@ model Client {
   id String @id @unique
   company String
   logotipo String?
+  cpf String?
+  cnpj String?
 
   users User[]
   project Project[]

@@ -58,6 +58,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
 			return response as unknown as Project[];
 		} catch (error: any) {
+			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}
