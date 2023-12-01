@@ -1,29 +1,26 @@
 import { randomUUID } from "node:crypto";
 import { Status } from "../application/adapters/status";
 
-export interface IProject {
+export interface ITask {
 	id?: string;
-	client_id: string;
+	project_id: string;
 	name: string;
 	description?: string;
 	status?: Status;
-	due: Date;
 }
 
-export class Project {
+export class Task {
 	id: string;
-	client_id: string;
+	project_id: string;
 	name: string;
 	description: string | null;
 	status: Status;
-	due: Date;
 
-	constructor({ id, client_id, name, description, status, due }: IProject) {
+	constructor({ id, project_id, name, description, status }: ITask) {
 		this.id = id || randomUUID();
-		this.client_id = client_id;
+		this.project_id = project_id;
 		this.name = name;
 		this.description = description || null;
 		this.status = status || "waiting";
-		this.due = due;
 	}
 }

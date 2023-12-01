@@ -69,6 +69,8 @@ export class ClientRepositoryImpl implements ClientRepository {
 					id: true,
 					company: true,
 					logotipo: true,
+					cnpj: true,
+					cpf: true,
 					users: {
 						select: {
 							name: true,
