@@ -1,0 +1,47 @@
+import { Router } from "express";
+import { prisma } from "../../database/prisma";
+import { TaskRepositoryImpl } from "../../database/repositories/task-repository-impl";
+import { CreateTaskUseCase } from "../../../application/use-cases/task-use-case/create-task-use-case";
+import { UpdateTaskUseCase } from "../../../application/use-cases/task-use-case/update-task-use-case";
+import { GetAllTasksUseCase } from "../../../application/use-cases/task-use-case/get-all-tasks-use-case";
+import { GetTaskUseCase } from "../../../application/use-cases/task-use-case/get-task-use-case";
+import { TaskController } from "../controllers/task-controller";
+import { AuthMiddleware } from "../middlewares/auth-middleware";
+
+const routes = Router();
+
+const taskRepository = new TaskRepositoryImpl(prisma);
+
+const createTaskUseCase = new CreateTaskUseCase(taskRepository);
+const updateTaskUseCase = new UpdateTaskUseCase(taskRepository);
+const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
+const getTaskUseCase = new GetTaskUseCase(taskRepository);
+
+const taskController = new TaskController(
+	createTaskUseCase,
+	updateTaskUseCase,
+	getAllTasksUseCase,
+	getTaskUseCase,
+);
+
+routes.post("/", AuthMiddleware, (req, res) => {
+	taskController.createTask(req, res);
+});
+
+routes.put("/:id", AuthMiddleware, (req, res) => {
+	taskController.updateTask(req, res);
+});
+
+routes.get("/", AuthMiddleware, (req, res) => {
+	taskController.getAllTasks(req, res);
+});
+
+routes.get("/:id", AuthMiddleware, (req, res) => {
+	taskController.getTask(req, res);
+});
+
+routes.get("/can-update/:id", (req, res) => {
+	taskController.canUpdate(req, res);
+});
+
+export default routes;
