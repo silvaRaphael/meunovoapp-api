@@ -38,15 +38,13 @@ export class TaskRepositoryImpl implements TaskRepository {
 				select: {
 					id: true,
 					name: true,
+					description: true,
 					status: true,
 					project: {
-						select: {
-							id: true,
-							name: true,
-						},
 						include: {
 							client: {
 								select: {
+									id: true,
 									company: true,
 									logotipo: true,
 								},
