@@ -7,6 +7,7 @@ import { GetAllProjectsUseCase } from "../../../application/use-cases/project-us
 import { GetProjectUseCase } from "../../../application/use-cases/project-use-case/get-project-use-case";
 import { ProjectController } from "../controllers/project-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
+import { RoleMiddleware } from "../middlewares/role-middleware";
 
 const routes = Router();
 
@@ -24,23 +25,23 @@ const projectController = new ProjectController(
 	getProjectUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.createProject(req, res);
 });
 
-routes.put("/:id", AuthMiddleware, (req, res) => {
+routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.updateProject(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.getAllProjects(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.getProject(req, res);
 });
 
-routes.get("/can-update/:id", (req, res) => {
+routes.get("/can-update/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.canUpdate(req, res);
 });
 

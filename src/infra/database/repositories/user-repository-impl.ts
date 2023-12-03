@@ -65,9 +65,6 @@ export class UserRepositoryImpl implements UserRepository {
 			const response = await this.database.user.findFirst({
 				where: {
 					email,
-					password: {
-						not: null,
-					},
 				},
 			});
 

@@ -7,6 +7,7 @@ import { GetAllTasksUseCase } from "../../../application/use-cases/task-use-case
 import { GetTaskUseCase } from "../../../application/use-cases/task-use-case/get-task-use-case";
 import { TaskController } from "../controllers/task-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
+import { RoleMiddleware } from "../middlewares/role-middleware";
 
 const routes = Router();
 
@@ -24,23 +25,23 @@ const taskController = new TaskController(
 	getTaskUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.createTask(req, res);
 });
 
-routes.put("/:id", AuthMiddleware, (req, res) => {
+routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.updateTask(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.getAllTasks(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.getTask(req, res);
 });
 
-routes.get("/can-update/:id", (req, res) => {
+routes.get("/can-update/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.canUpdate(req, res);
 });
 

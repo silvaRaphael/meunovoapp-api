@@ -10,6 +10,7 @@ import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
 import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-impl";
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
+import { RoleMiddleware } from "../middlewares/role-middleware";
 
 const routes = Router();
 
@@ -32,7 +33,7 @@ const userController = new UserController(
 	getUserByEmailUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.createUser(req, res);
 });
 
@@ -40,15 +41,15 @@ routes.put("/complete/:id", (req, res) => {
 	userController.completeUser(req, res);
 });
 
-routes.put("/:id?", AuthMiddleware, (req, res) => {
+routes.put("/:id?", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.updateUser(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.getAllUsers(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.getUser(req, res);
 });
 
@@ -56,7 +57,7 @@ routes.get("/can-update/:id", (req, res) => {
 	userController.canUpdate(req, res);
 });
 
-routes.post("/can-use-email", AuthMiddleware, (req, res) => {
+routes.post("/can-use-email", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.canUseEmail(req, res);
 });
 
