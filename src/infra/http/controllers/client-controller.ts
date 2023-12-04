@@ -36,14 +36,14 @@ export class ClientController {
 	async updateClient(req: Request, res: Response) {
 		try {
 			const { id } = updateClientSchema.parse(req.params);
-			const { company, cpf, cnpj, logotipo } = createClientSchema.parse(
-				req.body,
-			);
+			const { company, cpf, cnpj, logotipoName, logotipo } =
+				createClientSchema.parse(req.body);
 
 			let logotipoPath = "";
 
 			if (logotipo)
 				logotipoPath = this.uploadFileUseCase.execute({
+					fileName: logotipoName,
 					base64: logotipo,
 				}).fileName;
 

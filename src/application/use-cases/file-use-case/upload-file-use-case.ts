@@ -11,7 +11,9 @@ export class UploadFileUseCase {
 			const [, fileType] = fileAttributes.split("data:");
 			const [, fileExtension] = fileType.split("/");
 
-			const fullFileName = `${fileName || randomUUID()}.${fileExtension}`;
+			const fullFileName = `${
+				fileName?.replace(`.${fileExtension}`, "") || randomUUID()
+			}.${fileExtension}`;
 
 			const saveDir = "/app/files";
 

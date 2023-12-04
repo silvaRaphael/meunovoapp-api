@@ -24,6 +24,7 @@ export const createClientSchema = z.object({
 			(arg) => !arg || (arg && arg.replace(/[^0-9]+/g, "").length === 14),
 			"Digite um CNPJ válido.",
 		),
+	logotipoName: z.string().optional(),
 	logotipo: z.string().optional(),
 });
 export type CreateClientSchema = z.infer<typeof createClientSchema>;
