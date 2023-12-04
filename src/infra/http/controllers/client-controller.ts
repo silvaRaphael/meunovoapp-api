@@ -39,13 +39,15 @@ export class ClientController {
 			const { company, cpf, cnpj, logotipoName, logotipo } =
 				createClientSchema.parse(req.body);
 
-			let logotipoPath = "";
+			let logotipoPath;
 
 			if (logotipo)
 				logotipoPath = this.uploadFileUseCase.execute({
 					fileName: logotipoName,
 					base64: logotipo,
 				}).fileName;
+
+			if (!logotipo) logotipoPath = logotipoName;
 
 			await this.updateClientUseCase.execute({
 				id,

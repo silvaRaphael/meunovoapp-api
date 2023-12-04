@@ -7,6 +7,9 @@ export class UploadFileUseCase {
 		try {
 			const { fileName, base64 } = file;
 
+			if (!base64.includes(";base64,"))
+				return { fileName: fileName || "" };
+
 			const [fileAttributes, fileContent] = base64.split(";base64,");
 			const [, fileType] = fileAttributes.split("data:");
 			const [, fileExtension] = fileType.split("/");
