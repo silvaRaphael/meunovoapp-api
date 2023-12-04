@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { UploadFileSchema } from "../../adapters/file";
 
 export class UploadFileUseCase {
-	execute(file: UploadFileSchema): { path: string } {
+	execute(file: UploadFileSchema): { fileName: string } {
 		try {
 			const { fileName, base64 } = file;
 
@@ -23,7 +23,7 @@ export class UploadFileUseCase {
 
 			fs.writeFileSync(`${saveDir}/${fullFileName}`, dataBuffer);
 
-			return { path: `/files/${fullFileName}` };
+			return { fileName: fullFileName };
 		} catch (error: any) {
 			throw error;
 		}

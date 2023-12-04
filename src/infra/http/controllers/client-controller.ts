@@ -45,7 +45,7 @@ export class ClientController {
 			if (logotipo)
 				logotipoPath = this.uploadFileUseCase.execute({
 					base64: logotipo,
-				}).path;
+				}).fileName;
 
 			await this.updateClientUseCase.execute({
 				id,

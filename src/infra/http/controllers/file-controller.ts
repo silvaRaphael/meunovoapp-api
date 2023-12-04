@@ -16,7 +16,7 @@ export class FileController {
 			});
 
 			res.status(200).json({
-				path: response.path,
+				fileName: response.fileName,
 			});
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
