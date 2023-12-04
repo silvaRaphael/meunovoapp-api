@@ -9,8 +9,8 @@ services:
       # target: production
     ports:
       - 3333:3333
-      - 5555:5555
     volumes:
+      - /home/meunovoapp/files:/app/files
       - .:/app
       - /app/node_modules
       - /app/prisma

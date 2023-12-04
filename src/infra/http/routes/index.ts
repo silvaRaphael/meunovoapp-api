@@ -16,6 +16,6 @@ routes.use("/users", user);
 routes.use("/projects", project);
 routes.use("/tasks", task);
 
-routes.get("/", (_, res) => res.send(`API v1`));
+routes.get("/", (_, res) => res.end());
 
 export { routes };

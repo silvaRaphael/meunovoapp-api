@@ -33,6 +33,7 @@ export const AuthMiddleware = async (
 		(req as AuthRequest).token = parsedToken;
 		(req as AuthRequest).userEmail = response.email;
 		(req as AuthRequest).userRole = response.role;
+		(req as AuthRequest).userIsManager = response.is_manager;
 		(req as AuthRequest).userId = response.id;
 
 		next();

@@ -7,6 +7,9 @@ import { GetAllClientsUseCase } from "../../../application/use-cases/client-use-
 import { GetClientUseCase } from "../../../application/use-cases/client-use-case/get-client-use-case";
 import { ClientController } from "../controllers/client-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
+import { RoleMiddleware } from "../middlewares/role-middleware";
+import { ManagerMiddleware } from "../middlewares/manager-middleware";
+import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
 
 const routes = Router();
 
@@ -16,27 +19,29 @@ const createClientUseCase = new CreateClientUseCase(clientRepository);
 const updateClientUseCase = new UpdateClientUseCase(clientRepository);
 const getAllClientsUseCase = new GetAllClientsUseCase(clientRepository);
 const getClientUseCase = new GetClientUseCase(clientRepository);
+const uploadFileUseCase = new UploadFileUseCase();
 
 const clientController = new ClientController(
 	createClientUseCase,
 	updateClientUseCase,
 	getAllClientsUseCase,
 	getClientUseCase,
+	uploadFileUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	clientController.createClient(req, res);
 });
 
-routes.put("/:id", AuthMiddleware, (req, res) => {
+routes.put("/:id", AuthMiddleware, ManagerMiddleware, (req, res) => {
 	clientController.updateClient(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	clientController.getAllClients(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	clientController.getClient(req, res);
 });
 

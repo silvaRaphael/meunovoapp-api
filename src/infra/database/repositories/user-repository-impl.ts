@@ -50,6 +50,20 @@ export class UserRepositoryImpl implements UserRepository {
 				where: {
 					id,
 				},
+				select: {
+					name: true,
+					email: true,
+					client: {
+						where: {
+							users: {
+								some: {
+									id,
+									is_manager: true,
+								},
+							},
+						},
+					},
+				},
 			});
 
 			if (!response) return null;

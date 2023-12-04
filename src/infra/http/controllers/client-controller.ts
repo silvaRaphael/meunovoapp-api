@@ -8,6 +8,7 @@ import {
 	createClientSchema,
 	updateClientSchema,
 } from "../../../application/adapters/client";
+import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
 
 export class ClientController {
 	constructor(
@@ -15,6 +16,7 @@ export class ClientController {
 		private updateClientUseCase: UpdateClientUseCase,
 		private getAllClientsUseCase: GetAllClientsUseCase,
 		private getClientUseCase: GetClientUseCase,
+		private uploadFileUseCase: UploadFileUseCase,
 	) {}
 
 	async createClient(req: Request, res: Response) {
@@ -34,12 +36,23 @@ export class ClientController {
 	async updateClient(req: Request, res: Response) {
 		try {
 			const { id } = updateClientSchema.parse(req.params);
-			const { company, logotipo } = createClientSchema.parse(req.body);
+			const { company, cpf, cnpj, logotipo } = createClientSchema.parse(
+				req.body,
+			);
+
+			let logotipoPath = "";
+
+			if (logotipo)
+				logotipoPath = this.uploadFileUseCase.execute({
+					base64: logotipo,
+				}).path;
 
 			await this.updateClientUseCase.execute({
 				id,
 				company,
-				logotipo,
+				cpf,
+				cnpj,
+				logotipo: logotipoPath,
 			});
 
 			res.status(200).send();

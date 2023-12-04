@@ -8,6 +8,7 @@ import { GetAllEmailsUseCase } from "../../../application/use-cases/email-use-ca
 import { GetEmailUseCase } from "../../../application/use-cases/email-use-case/get-email-use-case";
 import { EmailController } from "../controllers/email-controller";
 import { ReplyEmailUseCase } from "../../../application/use-cases/email-use-case/reply-email-use-case";
+import { RoleMiddleware } from "../middlewares/role-middleware";
 
 const routes = Router();
 
@@ -29,15 +30,15 @@ routes.post("/", (req, res) => {
 	emailController.sendEmail(req, res);
 });
 
-routes.post("/:replyed", AuthMiddleware, (req, res) => {
+routes.post("/:replyed", AuthMiddleware, RoleMiddleware, (req, res) => {
 	emailController.replyEmail(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	emailController.getAllEmails(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	emailController.getEmail(req, res);
 });
 

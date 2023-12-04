@@ -41,12 +41,16 @@ routes.put("/complete/:id", (req, res) => {
 	userController.completeUser(req, res);
 });
 
-routes.put("/:id?", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.put("/:id?", AuthMiddleware, (req, res) => {
 	userController.updateUser(req, res);
 });
 
 routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.getAllUsers(req, res);
+});
+
+routes.get("/profile", AuthMiddleware, (req, res) => {
+	userController.getProfile(req, res);
 });
 
 routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {

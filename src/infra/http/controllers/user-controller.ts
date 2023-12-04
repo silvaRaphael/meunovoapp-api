@@ -126,6 +126,20 @@ export class UserController {
 		}
 	}
 
+	async getProfile(req: Request, res: Response) {
+		try {
+			const { userId: id } = req as AuthRequest;
+
+			if (!id) throw new Error("ID é necessário");
+
+			const response = await this.getUserUseCase.execute(id);
+
+			res.status(200).json(response);
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
 	async canUpdate(req: Request, res: Response) {
 		try {
 			const { id } = req.params;
