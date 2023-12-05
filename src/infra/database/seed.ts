@@ -42,7 +42,6 @@ async function seed() {
 				),
 				new User(
 					{
-						id: "6e161850-e0bf-4a13-8417-212dd796be2a",
 						name: "Raphael - Test",
 						email: "raphaeltiago89@gmail.com",
 						password:
