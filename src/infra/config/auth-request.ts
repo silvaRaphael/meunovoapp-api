@@ -5,5 +5,6 @@ export interface AuthRequest extends Request {
 	userEmail?: string;
 	userRole?: string;
 	userIsManager?: boolean;
+	clientId?: string;
 	token?: string;
 }

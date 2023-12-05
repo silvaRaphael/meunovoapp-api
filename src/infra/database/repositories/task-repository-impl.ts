@@ -1,4 +1,7 @@
-import { TaskRepository } from "../../../application/repositories/task-repository";
+import {
+	TaskFilter,
+	TaskRepository,
+} from "../../../application/repositories/task-repository";
 import { Task } from "../../../domain/task";
 import { PrismaType } from "../prisma";
 
@@ -32,7 +35,7 @@ export class TaskRepositoryImpl implements TaskRepository {
 		}
 	}
 
-	async getAll(): Promise<Task[]> {
+	async getAll(filters?: TaskFilter): Promise<Task[]> {
 		try {
 			const response = await this.database.task.findMany({
 				select: {
@@ -50,6 +53,16 @@ export class TaskRepositoryImpl implements TaskRepository {
 								},
 							},
 						},
+					},
+				},
+				where: {
+					project: {
+						client_id: filters?.client_id,
+					},
+				},
+				orderBy: {
+					project: {
+						due: "asc",
 					},
 				},
 			});

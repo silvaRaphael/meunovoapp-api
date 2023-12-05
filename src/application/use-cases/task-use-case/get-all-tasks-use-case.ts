@@ -1,12 +1,12 @@
 import { Task } from "../../../domain/task";
-import { TaskRepository } from "../../repositories/task-repository";
+import { TaskFilter, TaskRepository } from "../../repositories/task-repository";
 
 export class GetAllTasksUseCase {
 	constructor(private taskRepository: TaskRepository) {}
 
-	async execute(): Promise<Task[]> {
+	async execute(filters?: TaskFilter): Promise<Task[]> {
 		try {
-			return await this.taskRepository.getAll();
+			return await this.taskRepository.getAll(filters);
 		} catch (error: any) {
 			throw error;
 		}

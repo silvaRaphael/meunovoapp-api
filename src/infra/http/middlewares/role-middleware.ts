@@ -9,11 +9,9 @@ export const RoleMiddleware = async (
 ) => {
 	try {
 		const { userRole } = req as AuthRequest;
-		const { method } = req;
 
 		if (userRole !== "master") {
-			if (method.toLowerCase() !== "get")
-				throw new Error("Sem permissão.");
+			throw new Error("Sem permissão.");
 		}
 
 		next();

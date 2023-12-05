@@ -41,7 +41,7 @@ routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	clientController.getAllClients(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, (req, res) => {
 	clientController.getClient(req, res);
 });
 

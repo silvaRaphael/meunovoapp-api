@@ -5,13 +5,28 @@ import { Client } from "../../domain/client";
 const prisma = new PrismaClient();
 
 async function seed() {
-	const exists = await prisma.user.findUnique({
-		where: { email: "raphaeltiago02@gmail.com" },
+	const exists = await prisma.user.findMany({
+		select: {
+			id: true,
+		},
+		where: {
+			email: {
+				in: ["raphaeltiago02@gmail.com", "raphaeltiago89@gmail.com"],
+			},
+		},
 	});
 
 	if (exists) return;
 
 	await Promise.all([
+		prisma.client.createMany({
+			data: [
+				new Client({
+					id: "adeb4944-9f1b-43dc-89e6-be1d0d00598d",
+					company: "client test",
+				}),
+			],
+		}),
 		prisma.user.createMany({
 			data: [
 				new User(
@@ -25,14 +40,19 @@ async function seed() {
 					},
 					false,
 				),
-			],
-		}),
-		prisma.client.createMany({
-			data: [
-				new Client({
-					id: "adeb4944-9f1b-43dc-89e6-be1d0d00598d",
-					company: "client test",
-				}),
+				new User(
+					{
+						id: "6e161850-e0bf-4a13-8417-212dd796be2a",
+						name: "Raphael - Test",
+						email: "raphaeltiago89@gmail.com",
+						password:
+							"$2a$08$xgjWis2LW/.aJ.gnlhMy3O.frk9kV0E.F1Og/332rklD5vpBTL7Zq",
+						role: "client",
+						is_manager: true,
+						client_id: "adeb4944-9f1b-43dc-89e6-be1d0d00598d",
+					},
+					false,
+				),
 			],
 		}),
 	]);

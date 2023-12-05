@@ -1,4 +1,7 @@
-import { ProjectRepository } from "../../../application/repositories/project-repository";
+import {
+	ProjectFilter,
+	ProjectRepository,
+} from "../../../application/repositories/project-repository";
 import { Project } from "../../../domain/project";
 import { PrismaType } from "../prisma";
 
@@ -32,7 +35,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 		}
 	}
 
-	async getAll(): Promise<Project[]> {
+	async getAll(filters?: ProjectFilter): Promise<Project[]> {
 		try {
 			const response = await this.database.project.findMany({
 				select: {
@@ -52,6 +55,9 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 							status: true,
 						},
 					},
+				},
+				where: {
+					client_id: filters?.client_id,
 				},
 				orderBy: {
 					due: "asc",

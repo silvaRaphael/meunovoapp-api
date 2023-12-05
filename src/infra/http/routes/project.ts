@@ -33,11 +33,11 @@ routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	projectController.updateProject(req, res);
 });
 
-routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, (req, res) => {
 	projectController.getAllProjects(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, (req, res) => {
 	projectController.getProject(req, res);
 });
 

@@ -8,6 +8,7 @@ import {
 	createProjectSchema,
 	updateProjectSchema,
 } from "../../../application/adapters/project";
+import { AuthRequest } from "../../config/auth-request";
 
 export class ProjectController {
 	constructor(
@@ -60,7 +61,11 @@ export class ProjectController {
 
 	async getAllProjects(req: Request, res: Response) {
 		try {
-			const response = await this.getAllProjectsUseCase.execute();
+			const { clientId } = req as AuthRequest;
+
+			const response = await this.getAllProjectsUseCase.execute({
+				client_id: clientId,
+			});
 
 			res.status(200).json(response);
 		} catch (error: any) {

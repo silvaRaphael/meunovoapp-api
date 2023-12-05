@@ -33,11 +33,11 @@ routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
 	taskController.updateTask(req, res);
 });
 
-routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.get("/", AuthMiddleware, (req, res) => {
 	taskController.getAllTasks(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.get("/:id", AuthMiddleware, (req, res) => {
 	taskController.getTask(req, res);
 });
 

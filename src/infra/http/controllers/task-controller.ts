@@ -8,6 +8,7 @@ import {
 	createTaskSchema,
 	updateTaskSchema,
 } from "../../../application/adapters/task";
+import { AuthRequest } from "../../config/auth-request";
 
 export class TaskController {
 	constructor(
@@ -58,7 +59,11 @@ export class TaskController {
 
 	async getAllTasks(req: Request, res: Response) {
 		try {
-			const response = await this.getAllTasksUseCase.execute();
+			const { clientId } = req as AuthRequest;
+
+			const response = await this.getAllTasksUseCase.execute({
+				client_id: clientId,
+			});
 
 			res.status(200).json(response);
 		} catch (error: any) {
