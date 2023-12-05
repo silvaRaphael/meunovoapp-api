@@ -16,7 +16,7 @@ async function seed() {
 		},
 	});
 
-	if (exists) return;
+	if (exists.length) return;
 
 	await Promise.all([
 		prisma.client.createMany({
