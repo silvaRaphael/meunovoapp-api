@@ -59,6 +59,7 @@ async function seed() {
 
 seed()
 	.catch((e) => {
+		console.error(e);
 		throw e;
 	})
 	.finally(async () => {
