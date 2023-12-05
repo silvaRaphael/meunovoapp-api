@@ -46,6 +46,7 @@ export class ClientRepositoryImpl implements ClientRepository {
 						select: {
 							name: true,
 							email: true,
+							avatar: true,
 						},
 					},
 				},
@@ -76,6 +77,7 @@ export class ClientRepositoryImpl implements ClientRepository {
 							name: true,
 							email: true,
 							is_manager: true,
+							avatar: true,
 						},
 					},
 					projects: {

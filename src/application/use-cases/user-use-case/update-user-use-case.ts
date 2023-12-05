@@ -10,6 +10,7 @@ export class UpdateUserUseCase {
 		id,
 		name,
 		email,
+		avatar,
 		password,
 	}: { id: string } & UpdateUserSchema): Promise<void> {
 		try {
@@ -17,6 +18,7 @@ export class UpdateUserUseCase {
 				id,
 				name,
 				email,
+				avatar,
 			} as User;
 
 			if (password) userToUpdate.password = hashSync(password, 8);

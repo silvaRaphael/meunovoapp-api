@@ -48,6 +48,8 @@ export const updateUserSchema = z
 				required_error: "E-mail é necessário.",
 			})
 			.email({ message: "Digite um e-mail válido" }),
+		avatarName: z.string().optional(),
+		avatar: z.string().optional(),
 		old_password: z
 			.string({ required_error: "Senha antiga é necessária." })
 			.min(5, { message: "Digite uma senha maior." })

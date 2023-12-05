@@ -13,6 +13,7 @@ import {
 import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
 import { AuthRequest } from "../../config/auth-request";
+import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
 
 export class UserController {
 	constructor(
@@ -22,6 +23,7 @@ export class UserController {
 		private getAllUsersUseCase: GetAllUsersUseCase,
 		private getUserUseCase: GetUserUseCase,
 		private getUserByEmailUseCase: GetUserByEmailUseCase,
+		private uploadFileUseCase: UploadFileUseCase,
 	) {}
 
 	async createUser(req: Request, res: Response) {
@@ -75,7 +77,7 @@ export class UserController {
 			const { id: paramId } = req.params;
 			const id = paramId ?? userId;
 
-			const { name, email, old_password, password } =
+			const { name, email, avatarName, avatar, old_password, password } =
 				updateUserSchema.parse(req.body);
 
 			const user = await this.getUserByEmailUseCase.execute(email);
@@ -90,14 +92,25 @@ export class UserController {
 					throw new Error("Senha antiga incorreta.");
 			}
 
+			let avatarPath;
+
+			if (avatar)
+				avatarPath = this.uploadFileUseCase.execute({
+					fileName: avatarName,
+					base64: avatar,
+				}).fileName;
+
+			if (!avatar) avatarPath = avatarName;
+
 			await this.updateUserUseCase.execute({
 				id,
 				name,
 				email,
+				avatar: avatarPath,
 				password,
 			});
 
-			res.status(200).send();
+			res.status(200).json({ avatar: avatarPath });
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}

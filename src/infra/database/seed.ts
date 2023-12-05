@@ -11,7 +11,7 @@ async function seed() {
 		},
 		where: {
 			email: {
-				in: ["raphaeltiago02@gmail.com", "raphaeltiago89@gmail.com"],
+				in: ["raphaeltiago02@gmail.com", "contato@meunovoapp.com.br"],
 			},
 		},
 	});
@@ -23,7 +23,7 @@ async function seed() {
 			data: [
 				new Client({
 					id: "adeb4944-9f1b-43dc-89e6-be1d0d00598d",
-					company: "client test",
+					company: "MeuNovoApp",
 				}),
 			],
 		}),
@@ -42,8 +42,8 @@ async function seed() {
 				),
 				new User(
 					{
-						name: "Raphael - Test",
-						email: "raphaeltiago89@gmail.com",
+						name: "Raphael - ADM",
+						email: "contato@meunovoapp.com.br",
 						password:
 							"$2a$08$xgjWis2LW/.aJ.gnlhMy3O.frk9kV0E.F1Og/332rklD5vpBTL7Zq",
 						role: "client",

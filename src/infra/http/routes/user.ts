@@ -11,6 +11,7 @@ import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign
 import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-impl";
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
 import { RoleMiddleware } from "../middlewares/role-middleware";
+import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
 
 const routes = Router();
 
@@ -23,6 +24,7 @@ const signInUseCase = new SignInUseCase(authRepository, userRepository);
 const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
 const getUserUseCase = new GetUserUseCase(userRepository);
 const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
+const uploadFileUseCase = new UploadFileUseCase();
 
 const userController = new UserController(
 	createUserUseCase,
@@ -31,6 +33,7 @@ const userController = new UserController(
 	getAllUsersUseCase,
 	getUserUseCase,
 	getUserByEmailUseCase,
+	uploadFileUseCase,
 );
 
 routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {

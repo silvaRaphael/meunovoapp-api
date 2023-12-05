@@ -9,6 +9,7 @@ export interface IUser {
 	email: string;
 	password?: string;
 	role: Roles;
+	avatar?: string;
 	client_id?: string;
 	is_manager?: boolean;
 	token?: string;
@@ -20,6 +21,7 @@ export class User {
 	email: string;
 	password: string | null;
 	role: Roles;
+	avatar: string | null;
 	client_id: string | null;
 	is_manager: boolean;
 	token: string | null;
@@ -31,6 +33,7 @@ export class User {
 			email,
 			password,
 			role,
+			avatar,
 			client_id,
 			is_manager,
 			token,
@@ -46,6 +49,7 @@ export class User {
 				: password
 			: null;
 		this.role = role;
+		this.avatar = avatar || null;
 		this.client_id = client_id || null;
 		this.is_manager = is_manager || false;
 		this.token = token || null;
