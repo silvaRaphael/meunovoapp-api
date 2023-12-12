@@ -17,6 +17,7 @@ describe("Email tests", () => {
 	let getEmailUseCase: GetEmailUseCase;
 
 	let emailToSend: SendEmailSchema = {
+		title: "Test",
 		name: "Raphael",
 		from: process.env.EMAIL_SENDER || "",
 		to: [process.env.EMAIL_RECEIVER || ""],
@@ -41,7 +42,7 @@ describe("Email tests", () => {
 		expect(
 			await replyEmailUseCase.execute({
 				...emailToSend,
-				replyed: "41660587-f260-478c-b82d-7c56acf75b41",
+				replied: "41660587-f260-478c-b82d-7c56acf75b41",
 			}),
 		).toBeUndefined();
 	});

@@ -13,7 +13,7 @@ export interface EmailFilter {
 export interface EmailRepository {
 	send(email: Email): Promise<{ id: string }>;
 	create(email: Email): Promise<void>;
-	update(id: string): Promise<void>;
+	setReplied(id: string): Promise<void>;
 	getAll(filters?: EmailFilter): Promise<Email[]>;
 	getOne(id: string): Promise<Email | null>;
 }

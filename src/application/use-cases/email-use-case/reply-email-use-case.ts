@@ -15,7 +15,7 @@ export class ReplyEmailUseCase {
 
 			await Promise.all([
 				this.emailRepository.create(emailToReply),
-				this.emailRepository.update(email.replyed),
+				this.emailRepository.setReplied(email.replied),
 			]);
 		} catch (error: any) {
 			throw error;

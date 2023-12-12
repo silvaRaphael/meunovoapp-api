@@ -42,7 +42,7 @@ export class EmailRepositoryImpl implements EmailRepository {
 		}
 	}
 
-	async update(id: string): Promise<void> {
+	async setReplied(id: string): Promise<void> {
 		try {
 			await this.database.email.update({
 				where: {
@@ -90,6 +90,7 @@ export class EmailRepositoryImpl implements EmailRepository {
 
 			return response as unknown as Email[];
 		} catch (error: any) {
+			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}

@@ -26,12 +26,38 @@ const emailController = new EmailController(
 	getEmailUseCase,
 );
 
-routes.post("/", (req, res) => {
-	emailController.sendEmail(req, res);
+routes.post("/contact-message", (req, res) => {
+	emailController.sendContactMessageEmail(req, res);
 });
 
-routes.post("/:replyed", AuthMiddleware, RoleMiddleware, (req, res) => {
-	emailController.replyEmail(req, res);
+routes.post("/budget-message", (req, res) => {
+	emailController.sendBudgetMessageEmail(req, res);
+});
+
+routes.post("/user-invite", AuthMiddleware, RoleMiddleware, (req, res) => {
+	emailController.sendUserInviteMessageEmail(req, res);
+});
+
+routes.post(
+	"/reply-contact-message",
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		emailController.replyContactMessageEmail(req, res);
+	},
+);
+
+routes.post(
+	"/reply-budget-message",
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		emailController.replyBudgetMessageEmail(req, res);
+	},
+);
+
+routes.post("/", (req, res) => {
+	emailController.sendEmail(req, res);
 });
 
 routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
