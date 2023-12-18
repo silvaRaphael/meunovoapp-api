@@ -34,8 +34,6 @@ describe("Client tests", () => {
 	it("should get all clients", async () => {
 		const response = await getAllClientsUseCase.execute();
 
-		console.log(response);
-
 		expect(response.length).toBeGreaterThan(0);
 	});
 

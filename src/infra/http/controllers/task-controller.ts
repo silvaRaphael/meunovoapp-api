@@ -40,8 +40,6 @@ export class TaskController {
 		try {
 			const { id } = updateTaskSchema.parse(req.params);
 
-			console.log(req.body.startDate);
-
 			const { project_id, name, description, status, startDate } =
 				createTaskSchema.parse(req.body);
 
