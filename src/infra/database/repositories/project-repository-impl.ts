@@ -94,6 +94,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 							id: true,
 							name: true,
 							status: true,
+							startDate: true,
+							endDate: true,
 						},
 					},
 				},

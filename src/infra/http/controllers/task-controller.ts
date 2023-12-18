@@ -40,7 +40,9 @@ export class TaskController {
 		try {
 			const { id } = updateTaskSchema.parse(req.params);
 
-			const { project_id, name, description, status } =
+			console.log(req.body.startDate);
+
+			const { project_id, name, description, status, startDate } =
 				createTaskSchema.parse(req.body);
 
 			await this.updateTaskUseCase.execute({
@@ -49,6 +51,7 @@ export class TaskController {
 				name,
 				description,
 				status,
+				startDate,
 			});
 
 			res.status(200).send();

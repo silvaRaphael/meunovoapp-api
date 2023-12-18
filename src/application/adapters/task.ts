@@ -24,6 +24,12 @@ export const createTaskSchema = z.object({
 			required_error: "Status é necessário.",
 		})
 		.optional(),
+	startDate: z.coerce
+		.date({
+			required_error: "Data de início é necessária.",
+		})
+		.optional()
+		.nullable(),
 });
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
 

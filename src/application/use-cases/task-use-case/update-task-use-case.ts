@@ -7,7 +7,18 @@ export class UpdateTaskUseCase {
 
 	async execute(task: UpdateTaskSchema & CreateTaskSchema): Promise<void> {
 		try {
-			const taskToUpdate = new Task(task);
+			if (task.status === "in progress" && !task.startDate)
+				(task as Task).startDate = new Date();
+
+			if ((["cancelled", "completed"] as any).includes(task.status))
+				(task as Task).endDate = new Date();
+
+			if (!task.startDate) task.startDate = undefined;
+
+			const taskToUpdate = new Task({
+				...task,
+				startDate: task.startDate,
+			});
 
 			await this.taskRepository.update(taskToUpdate);
 		} catch (error: any) {

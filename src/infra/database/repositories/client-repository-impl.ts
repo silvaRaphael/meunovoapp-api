@@ -81,10 +81,7 @@ export class ClientRepositoryImpl implements ClientRepository {
 							is_manager: true,
 							avatar: true,
 						},
-						orderBy: {
-							is_manager: "asc",
-							name: "asc",
-						},
+						orderBy: { name: "asc" },
 					},
 					projects: {
 						select: {

@@ -17,8 +17,8 @@ export class Task {
 	name: string;
 	description: string | null;
 	status: Status;
-	startDate: Date | null;
-	endDate: Date | null;
+	startDate?: Date;
+	endDate?: Date;
 
 	constructor({
 		id,
@@ -34,7 +34,7 @@ export class Task {
 		this.name = name;
 		this.description = description || null;
 		this.status = status || "waiting";
-		this.startDate = startDate || null;
-		this.endDate = endDate || null;
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 }

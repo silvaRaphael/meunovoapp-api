@@ -43,6 +43,8 @@ export class TaskRepositoryImpl implements TaskRepository {
 					name: true,
 					description: true,
 					status: true,
+					startDate: true,
+					endDate: true,
 					project: {
 						include: {
 							client: {
@@ -61,9 +63,7 @@ export class TaskRepositoryImpl implements TaskRepository {
 					},
 				},
 				orderBy: {
-					project: {
-						due: "asc",
-					},
+					startDate: "asc",
 				},
 			});
 
@@ -87,9 +87,12 @@ export class TaskRepositoryImpl implements TaskRepository {
 					name: true,
 					status: true,
 					description: true,
+					startDate: true,
 					project: {
 						select: {
 							id: true,
+							due: true,
+							status: true,
 						},
 					},
 				},
