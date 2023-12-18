@@ -54,14 +54,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 						select: {
 							status: true,
 						},
+						orderBy: { startDate: "asc" },
 					},
 				},
 				where: {
 					client_id: filters?.client_id,
 				},
-				orderBy: {
-					due: "asc",
-				},
+				orderBy: { due: "asc" },
 			});
 
 			if (!response) return [];

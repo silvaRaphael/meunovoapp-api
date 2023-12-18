@@ -17,23 +17,33 @@ export const createUserSchema = z.object({
 });
 export type CreateUserSchema = z.infer<typeof createUserSchema>;
 
-export const completeUserSchema = z.object({
-	name: z
-		.string({
-			required_error: "Nome é necessário.",
-		})
-		.max(50, { message: "O nome deve ter ao máximo 50 digitos." }),
-	email: z
-		.string({
-			required_error: "E-mail é necessário.",
-		})
-		.email({ message: "Digite um e-mail válido" }),
-	password: z
-		.string({
-			required_error: "Senha é necessária.",
-		})
-		.max(20, { message: "A senha deve ter ao máximo 20 digitos." }),
-});
+export const completeUserSchema = z
+	.object({
+		name: z
+			.string({
+				required_error: "Nome é necessário.",
+			})
+			.max(50, { message: "O nome deve ter ao máximo 50 digitos." }),
+		email: z
+			.string({
+				required_error: "E-mail é necessário.",
+			})
+			.email({ message: "Digite um e-mail válido" }),
+		avatarName: z.string().optional(),
+		avatar: z.string().optional(),
+		password: z
+			.string({
+				required_error: "Senha é necessária.",
+			})
+			.max(20, { message: "A senha deve ter ao máximo 20 digitos." }),
+		confirm_password: z.string({
+			required_error: "Confirme sua senha.",
+		}),
+	})
+	.refine((data) => data.password === data.confirm_password, {
+		message: "As senhas devem ser iguais.",
+		path: ["confirm_password"],
+	});
 export type CompleteUserSchema = z.infer<typeof completeUserSchema>;
 
 export const updateUserSchema = z

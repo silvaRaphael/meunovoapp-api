@@ -49,14 +49,27 @@ export class UserController {
 	async completeUser(req: Request, res: Response) {
 		try {
 			const { id } = req.params;
-			const { name, email, password } = completeUserSchema.parse(
+			const { name, email, avatar, password } = completeUserSchema.parse(
 				req.body,
 			);
+
+			const userEmail = await this.getUserByEmailUseCase.execute(email);
+
+			if (userEmail && userEmail.id !== id)
+				throw new Error("E-mail já em uso.");
+
+			let avatarPath;
+
+			if (avatar)
+				avatarPath = this.uploadFileUseCase.execute({
+					base64: avatar,
+				}).fileName;
 
 			await this.updateUserUseCase.execute({
 				id,
 				name,
 				email,
+				avatar: avatarPath,
 				password,
 			});
 
@@ -173,7 +186,7 @@ export class UserController {
 
 	async canUseEmail(req: Request, res: Response) {
 		try {
-			const id = (req as AuthRequest).userId;
+			const id = req.params.id || (req as AuthRequest).userId;
 			const { email } = req.body;
 
 			const response = await this.getUserByEmailUseCase.execute(email);

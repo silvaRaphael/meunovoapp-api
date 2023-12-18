@@ -48,8 +48,10 @@ export class ClientRepositoryImpl implements ClientRepository {
 							email: true,
 							avatar: true,
 						},
+						orderBy: { name: "asc" },
 					},
 				},
+				orderBy: { company: "asc" },
 			});
 
 			if (!response) return [];
@@ -79,6 +81,10 @@ export class ClientRepositoryImpl implements ClientRepository {
 							is_manager: true,
 							avatar: true,
 						},
+						orderBy: {
+							is_manager: "asc",
+							name: "asc",
+						},
 					},
 					projects: {
 						select: {
@@ -88,8 +94,10 @@ export class ClientRepositoryImpl implements ClientRepository {
 							tasks: true,
 							due: true,
 						},
+						orderBy: { due: "asc" },
 					},
 				},
+				orderBy: { company: "asc" },
 			});
 
 			if (!response) return null;

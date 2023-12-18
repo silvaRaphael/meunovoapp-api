@@ -64,7 +64,10 @@ routes.get("/can-update/:id", (req, res) => {
 	userController.canUpdate(req, res);
 });
 
-routes.post("/can-use-email", AuthMiddleware, RoleMiddleware, (req, res) => {
+routes.post("/can-use-email", AuthMiddleware, (req, res) => {
+	userController.canUseEmail(req, res);
+});
+routes.post("/can-use-email/:id", (req, res) => {
 	userController.canUseEmail(req, res);
 });
 
