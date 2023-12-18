@@ -13,12 +13,7 @@ export class UpdateTaskUseCase {
 			if ((["cancelled", "completed"] as any).includes(task.status))
 				(task as Task).endDate = new Date();
 
-			if (!task.startDate) task.startDate = undefined;
-
-			const taskToUpdate = new Task({
-				...task,
-				startDate: task.startDate,
-			});
+			const taskToUpdate = new Task(task);
 
 			await this.taskRepository.update(taskToUpdate);
 		} catch (error: any) {
