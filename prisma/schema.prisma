@@ -19,6 +19,7 @@ model User {
   token    String?
 
   client Client? @relation(fields: [client_id], references: [id])
+  notifications Notification[]
 }
 
 model Email {
@@ -67,4 +68,16 @@ model Task {
   endDate DateTime?
 
   project Project? @relation(fields: [project_id], references: [id])
+}
+
+model Notification {
+  	id   String @id @unique
+    user_id String
+    type  String
+    title  String
+    description  String?
+    read  Boolean
+    created_at DateTime
+
+    user User @relation(fields: [user_id], references: [id])
 }
