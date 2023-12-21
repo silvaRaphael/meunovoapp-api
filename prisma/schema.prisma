@@ -20,6 +20,7 @@ model User {
 
   client Client? @relation(fields: [client_id], references: [id])
   notifications Notification[]
+  userPreferences UserPreferences?
 }
 
 model Email {
@@ -81,4 +82,12 @@ model Notification {
     created_at DateTime
 
     user User @relation(fields: [user_id], references: [id])
+}
+
+model UserPreferences {
+  user_id String @id @unique
+  email_notification Boolean
+  console_notification Boolean
+
+  user User @relation(fields: [user_id], references: [id])
 }

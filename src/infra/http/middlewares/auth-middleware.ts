@@ -14,7 +14,7 @@ export const AuthMiddleware = async (
 	const { authorization } = req.headers;
 
 	try {
-		if (!authorization) throw Error;
+		if (!authorization) throw new Error("Token não informado.");
 
 		const [, token] = authorization.split("Bearer ");
 
