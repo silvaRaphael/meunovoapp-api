@@ -10,11 +10,11 @@ export class UpdateProjectUseCase {
 
 	async execute(
 		project: UpdateProjectSchema & CreateProjectSchema,
-	): Promise<void> {
+	): Promise<{ userId: string }[]> {
 		try {
 			const projectToUpdate = new Project(project);
 
-			await this.projectRepository.update(projectToUpdate);
+			return await this.projectRepository.update(projectToUpdate);
 		} catch (error: any) {
 			throw error;
 		}

@@ -8,28 +8,60 @@ import { PrismaType } from "../prisma";
 export class ProjectRepositoryImpl implements ProjectRepository {
 	constructor(private database: PrismaType) {}
 
-	async create(project: Project): Promise<void> {
+	async create(project: Project): Promise<{ userId: string }[]> {
 		try {
-			await this.database.project.create({
+			const response = await this.database.project.create({
 				data: {
 					...project,
 				},
+				select: {
+					client: {
+						select: {
+							users: {
+								select: {
+									id: true,
+								},
+							},
+						},
+					},
+				},
 			});
+
+			return (
+				response.client?.users.map((item) => ({ userId: item.id })) ??
+				[]
+			);
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
 	}
 
-	async update(project: Project): Promise<void> {
+	async update(project: Project): Promise<{ userId: string }[]> {
 		try {
-			await this.database.project.update({
+			const response = await this.database.project.update({
 				data: {
 					...project,
 				},
 				where: {
 					id: project.id,
 				},
+				select: {
+					client: {
+						select: {
+							users: {
+								select: {
+									id: true,
+								},
+							},
+						},
+					},
+				},
 			});
+
+			return (
+				response.client?.users.map((item) => ({ userId: item.id })) ??
+				[]
+			);
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
@@ -68,7 +100,6 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
 			return response as unknown as Project[];
 		} catch (error: any) {
-			console.error(error);
 			throw new Error("DB Error.");
 		}
 	}

@@ -8,28 +8,70 @@ import { PrismaType } from "../prisma";
 export class TaskRepositoryImpl implements TaskRepository {
 	constructor(private database: PrismaType) {}
 
-	async create(task: Task): Promise<void> {
+	async create(task: Task): Promise<{ userId: string }[]> {
 		try {
-			await this.database.task.create({
+			const response = await this.database.task.create({
 				data: {
 					...task,
 				},
+				select: {
+					project: {
+						select: {
+							client: {
+								select: {
+									users: {
+										select: {
+											id: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			});
+
+			return (
+				response.project?.client?.users.map((item) => ({
+					userId: item.id,
+				})) ?? []
+			);
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
 	}
 
-	async update(task: Task): Promise<void> {
+	async update(task: Task): Promise<{ userId: string }[]> {
 		try {
-			await this.database.task.update({
+			const response = await this.database.task.update({
 				data: {
 					...task,
 				},
 				where: {
 					id: task.id,
 				},
+				select: {
+					project: {
+						select: {
+							client: {
+								select: {
+									users: {
+										select: {
+											id: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			});
+
+			return (
+				response.project?.client?.users.map((item) => ({
+					userId: item.id,
+				})) ?? []
+			);
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}

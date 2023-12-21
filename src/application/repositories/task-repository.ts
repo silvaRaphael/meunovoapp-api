@@ -5,8 +5,8 @@ export interface TaskFilter {
 }
 
 export interface TaskRepository {
-	create(user: Task): Promise<void>;
-	update(user: Task): Promise<void>;
+	create(user: Task): Promise<{ userId: string }[]>;
+	update(user: Task): Promise<{ userId: string }[]>;
 	getAll(filters?: TaskFilter): Promise<Task[]>;
 	getOne(id: string): Promise<Task | null>;
 }

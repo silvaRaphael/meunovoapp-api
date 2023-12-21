@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+export const userIdSchema = z.object({
+	userId: z
+		.string({
+			required_error: "ID é necessário.",
+		})
+		.uuid({
+			message: "ID válido é necessário.",
+		}),
+});
+export type UserIdSchema = z.infer<typeof userIdSchema>;
+
 export const createUserSchema = z.object({
 	email: z
 		.string({

@@ -9,6 +9,7 @@ import {
 	updateProjectSchema,
 } from "../../../application/adapters/project";
 import { AuthRequest } from "../../config/auth-request";
+import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
 
 export class ProjectController {
 	constructor(
@@ -16,6 +17,8 @@ export class ProjectController {
 		private updateProjectUseCase: UpdateProjectUseCase,
 		private getAllProjectsUseCase: GetAllProjectsUseCase,
 		private getProjectUseCase: GetProjectUseCase,
+
+		private createNotificationUseCase: CreateNotificationUseCase,
 	) {}
 
 	async createProject(req: Request, res: Response) {
@@ -23,12 +26,21 @@ export class ProjectController {
 			const { client_id, name, description, status, due } =
 				createProjectSchema.parse(req.body);
 
-			await this.createProjectUseCase.execute({
+			const response = await this.createProjectUseCase.execute({
 				client_id,
 				name,
 				description,
 				status,
 				due,
+			});
+
+			response.forEach(({ userId }) => {
+				this.createNotificationUseCase.execute({
+					user_id: userId,
+					title: "Projeto",
+					description: `Projeto "${name}" foi criado!`,
+					type: "pending",
+				});
 			});
 
 			res.status(200).send();
@@ -44,7 +56,7 @@ export class ProjectController {
 			const { client_id, name, description, status, due } =
 				createProjectSchema.parse(req.body);
 
-			await this.updateProjectUseCase.execute({
+			const response = await this.updateProjectUseCase.execute({
 				id,
 				client_id,
 				name,
@@ -52,6 +64,20 @@ export class ProjectController {
 				status,
 				due,
 			});
+
+			if (["in progress", "completed"].includes(status as any)) {
+				response.forEach(({ userId }) => {
+					this.createNotificationUseCase.execute({
+						user_id: userId,
+						title: "Projeto",
+						type: status === "in progress" ? "started" : "done",
+						description: `Projeto "${name}" foi ${
+							status === "in progress" ? "iniciado" : "finalizado"
+						}!`,
+						link: `/projetos/${id}`,
+					});
+				});
+			}
 
 			res.status(200).send();
 		} catch (error: any) {

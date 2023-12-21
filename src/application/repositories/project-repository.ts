@@ -5,8 +5,8 @@ export interface ProjectFilter {
 }
 
 export interface ProjectRepository {
-	create(user: Project): Promise<void>;
-	update(user: Project): Promise<void>;
+	create(user: Project): Promise<{ userId: string }[]>;
+	update(user: Project): Promise<{ userId: string }[]>;
 	getAll(filters?: ProjectFilter): Promise<Project[]>;
 	getOne(id: string): Promise<Project | null>;
 }

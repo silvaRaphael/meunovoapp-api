@@ -5,7 +5,9 @@ import { TaskRepository } from "../../repositories/task-repository";
 export class UpdateTaskUseCase {
 	constructor(private taskRepository: TaskRepository) {}
 
-	async execute(task: UpdateTaskSchema & CreateTaskSchema): Promise<void> {
+	async execute(
+		task: UpdateTaskSchema & CreateTaskSchema,
+	): Promise<{ userId: string }[]> {
 		try {
 			if (task.status === "in progress" && !task.startDate)
 				(task as Task).startDate = new Date();
@@ -15,7 +17,7 @@ export class UpdateTaskUseCase {
 
 			const taskToUpdate = new Task(task);
 
-			await this.taskRepository.update(taskToUpdate);
+			return await this.taskRepository.update(taskToUpdate);
 		} catch (error: any) {
 			throw error;
 		}

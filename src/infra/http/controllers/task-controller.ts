@@ -9,6 +9,7 @@ import {
 	updateTaskSchema,
 } from "../../../application/adapters/task";
 import { AuthRequest } from "../../config/auth-request";
+import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
 
 export class TaskController {
 	constructor(
@@ -16,6 +17,8 @@ export class TaskController {
 		private updateTaskUseCase: UpdateTaskUseCase,
 		private getAllTasksUseCase: GetAllTasksUseCase,
 		private getTaskUseCase: GetTaskUseCase,
+
+		private createNotificationUseCase: CreateNotificationUseCase,
 	) {}
 
 	async createTask(req: Request, res: Response) {
@@ -23,11 +26,20 @@ export class TaskController {
 			const { project_id, name, description, status } =
 				createTaskSchema.parse(req.body);
 
-			await this.createTaskUseCase.execute({
+			const response = await this.createTaskUseCase.execute({
 				project_id,
 				name,
 				description,
 				status,
+			});
+
+			response.forEach(({ userId }) => {
+				this.createNotificationUseCase.execute({
+					user_id: userId,
+					title: "Tarefa",
+					type: "pending",
+					description: `Tarefa "${name}" foi criada!`,
+				});
 			});
 
 			res.status(200).send();
@@ -43,7 +55,7 @@ export class TaskController {
 			const { project_id, name, description, status, startDate } =
 				createTaskSchema.parse(req.body);
 
-			await this.updateTaskUseCase.execute({
+			const response = await this.updateTaskUseCase.execute({
 				id,
 				project_id,
 				name,
@@ -51,6 +63,20 @@ export class TaskController {
 				status,
 				startDate,
 			});
+
+			if (["in progress", "completed"].includes(status as any)) {
+				response.forEach(({ userId }) => {
+					this.createNotificationUseCase.execute({
+						user_id: userId,
+						title: "Tarefa",
+						type: status === "in progress" ? "started" : "done",
+						description: `Tarefa "${name}" foi ${
+							status === "in progress" ? "iniciada" : "finalizada"
+						}!`,
+						link: `/tarefas/${id}`,
+					});
+				});
+			}
 
 			res.status(200).send();
 		} catch (error: any) {

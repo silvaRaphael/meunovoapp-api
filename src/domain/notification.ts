@@ -8,7 +8,8 @@ export interface INotification {
 	type: NotificationType;
 	title: string;
 	description?: string;
-	read: boolean;
+	link?: string;
+	read?: boolean;
 	created_at?: Date;
 }
 
@@ -18,6 +19,7 @@ export class Notification {
 	type: NotificationType;
 	title: string;
 	description: string | null;
+	link: string | null;
 	read: boolean;
 	created_at: Date;
 
@@ -28,6 +30,7 @@ export class Notification {
 		title,
 		description,
 		read,
+		link,
 		created_at,
 	}: INotification) {
 		this.id = id || randomUUID();
@@ -35,6 +38,7 @@ export class Notification {
 		this.type = type;
 		this.title = title;
 		this.description = description || null;
+		this.link = link || null;
 		this.read = read || false;
 		this.created_at = created_at || new Date();
 	}

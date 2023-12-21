@@ -5,11 +5,11 @@ import { ProjectRepository } from "../../repositories/project-repository";
 export class CreateProjectUseCase {
 	constructor(private projectRepository: ProjectRepository) {}
 
-	async execute(project: CreateProjectSchema): Promise<void> {
+	async execute(project: CreateProjectSchema): Promise<{ userId: string }[]> {
 		try {
 			const projectToCreate = new Project(project);
 
-			await this.projectRepository.create(projectToCreate);
+			return await this.projectRepository.create(projectToCreate);
 		} catch (error: any) {
 			throw error;
 		}

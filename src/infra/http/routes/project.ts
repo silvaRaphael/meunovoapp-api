@@ -8,21 +8,29 @@ import { GetProjectUseCase } from "../../../application/use-cases/project-use-ca
 import { ProjectController } from "../controllers/project-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { RoleMiddleware } from "../middlewares/role-middleware";
+import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import { NotificationRepositoryImpl } from "../../database/repositories/notification-repository-impl";
 
 const routes = Router();
 
 const projectRepository = new ProjectRepositoryImpl(prisma);
+const notificationRepository = new NotificationRepositoryImpl(prisma);
 
 const createProjectUseCase = new CreateProjectUseCase(projectRepository);
 const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
 const getAllProjectsUseCase = new GetAllProjectsUseCase(projectRepository);
 const getProjectUseCase = new GetProjectUseCase(projectRepository);
 
+const createNotificationUseCase = new CreateNotificationUseCase(
+	notificationRepository,
+);
+
 const projectController = new ProjectController(
 	createProjectUseCase,
 	updateProjectUseCase,
 	getAllProjectsUseCase,
 	getProjectUseCase,
+	createNotificationUseCase,
 );
 
 routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
