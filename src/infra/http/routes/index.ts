@@ -5,6 +5,7 @@ import email from "./email";
 import notifications from "./notification";
 import client from "./client";
 import user from "./user";
+import preferences from "./user-preferences";
 import project from "./project";
 import task from "./task";
 
@@ -15,6 +16,7 @@ routes.use("/emails", email);
 routes.use("/notifications", notifications);
 routes.use("/clients", client);
 routes.use("/users", user);
+routes.use("/preferences", preferences);
 routes.use("/projects", project);
 routes.use("/tasks", task);
 
