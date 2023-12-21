@@ -60,7 +60,9 @@ export class TaskRepositoryImpl implements TaskRepository {
 				where: {
 					project: {
 						client_id: filters?.client_id,
+						status: { not: "cancelled" },
 					},
+					status: { not: "cancelled" },
 				},
 				orderBy: {
 					startDate: "asc",
@@ -81,6 +83,7 @@ export class TaskRepositoryImpl implements TaskRepository {
 			const response = await this.database.task.findFirst({
 				where: {
 					id,
+					status: { not: "cancelled" },
 				},
 				select: {
 					id: true,

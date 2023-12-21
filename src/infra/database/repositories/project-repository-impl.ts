@@ -59,6 +59,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 				},
 				where: {
 					client_id: filters?.client_id,
+					status: { not: "cancelled" },
 				},
 				orderBy: { due: "asc" },
 			});
@@ -96,6 +97,9 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 							status: true,
 							startDate: true,
 							endDate: true,
+						},
+						where: {
+							status: { not: "cancelled" },
 						},
 					},
 				},
