@@ -7,6 +7,7 @@ export interface IProject {
 	name: string;
 	description?: string;
 	status?: Status;
+	budget?: number;
 	due: Date;
 }
 
@@ -16,13 +17,23 @@ export class Project {
 	name: string;
 	description: string | null;
 	status: Status;
+	budget: number | null;
 	due: Date;
 
-	constructor({ id, client_id, name, description, status, due }: IProject) {
+	constructor({
+		id,
+		client_id,
+		name,
+		description,
+		status,
+		budget,
+		due,
+	}: IProject) {
 		this.id = id || randomUUID();
 		this.client_id = client_id;
 		this.name = name;
 		this.description = description || null;
+		this.budget = budget || null;
 		this.status = status || "waiting";
 		this.due = due;
 	}

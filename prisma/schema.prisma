@@ -52,6 +52,7 @@ model Project {
 	name String
 	description String?
 	status String?
+  budget Float?
 	due DateTime
 
   tasks Task[]
