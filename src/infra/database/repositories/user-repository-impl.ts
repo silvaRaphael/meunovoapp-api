@@ -54,6 +54,8 @@ export class UserRepositoryImpl implements UserRepository {
 					name: true,
 					email: true,
 					avatar: true,
+					notifications: true,
+					userPreferences: true,
 					client: {
 						where: {
 							users: {
