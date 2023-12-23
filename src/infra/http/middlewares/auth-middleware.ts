@@ -39,6 +39,6 @@ export const AuthMiddleware = async (
 
 		next();
 	} catch (error: any) {
-		res.status(401).send({ error: HandleError(error) });
+		res.status(401).send({ error: HandleError(error), redirect: "/login" });
 	}
 };

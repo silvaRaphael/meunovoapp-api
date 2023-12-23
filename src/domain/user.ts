@@ -13,6 +13,8 @@ export interface IUser {
 	client_id?: string;
 	is_manager?: boolean;
 	token?: string;
+	invited_at?: Date;
+	activated_at?: Date;
 }
 
 export class User {
@@ -22,9 +24,11 @@ export class User {
 	password: string | null;
 	role: Roles;
 	avatar: string | null;
-	client_id: string | null;
+	client_id?: string | null;
 	is_manager: boolean;
 	token: string | null;
+	invited_at?: Date;
+	activated_at?: Date;
 
 	constructor(
 		{
@@ -37,6 +41,8 @@ export class User {
 			client_id,
 			is_manager,
 			token,
+			invited_at,
+			activated_at,
 		}: IUser,
 		autoHashPassword: boolean = true,
 	) {
@@ -50,8 +56,10 @@ export class User {
 			: null;
 		this.role = role;
 		this.avatar = avatar || null;
-		this.client_id = client_id || null;
+		this.client_id = client_id;
 		this.is_manager = is_manager || false;
 		this.token = token || null;
+		this.invited_at = invited_at;
+		this.activated_at = activated_at;
 	}
 }

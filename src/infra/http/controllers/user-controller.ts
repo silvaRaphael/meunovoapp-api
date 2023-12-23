@@ -14,6 +14,17 @@ import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
 import { AuthRequest } from "../../config/auth-request";
 import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
+import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
+import {
+	InviteUserMessageTemplate,
+	inviteUserMessageTemplate,
+} from "../../templates/invite-user-message-template";
+import { replaceKeys } from "../utils/replace-keys";
+import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import {
+	sendEmailSchema,
+	validEmailSchema,
+} from "../../../application/adapters/email";
 
 export class UserController {
 	constructor(
@@ -24,6 +35,9 @@ export class UserController {
 		private getUserUseCase: GetUserUseCase,
 		private getUserByEmailUseCase: GetUserByEmailUseCase,
 		private uploadFileUseCase: UploadFileUseCase,
+
+		private createNotificationUseCase: CreateNotificationUseCase,
+		private sendEmailUseCase: SendEmailUseCase,
 	) {}
 
 	async createUser(req: Request, res: Response) {
@@ -38,9 +52,46 @@ export class UserController {
 				is_manager,
 			});
 
-			res.status(200).json({
-				id: response.id,
+			this.sendEmailUseCase.execute({
+				from: process.env.EMAIL_SENDER || "",
+				to: [email],
+				subject: "Você recebeu um convite para se juntar à MeuNovoApp",
+				html: replaceKeys<InviteUserMessageTemplate>(
+					inviteUserMessageTemplate,
+					{
+						"[userId]": response.id,
+					},
+				),
+				type: "user-invite",
+				no_save: true,
 			});
+
+			res.status(200).send();
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
+	async inviteUser(req: Request, res: Response) {
+		try {
+			const { id } = req.params;
+			const { email } = validEmailSchema.parse(req.body);
+
+			await this.sendEmailUseCase.execute({
+				from: process.env.EMAIL_SENDER || "",
+				to: [email],
+				subject: "Você recebeu um convite para se juntar à MeuNovoApp",
+				html: replaceKeys<InviteUserMessageTemplate>(
+					inviteUserMessageTemplate,
+					{
+						"[userId]": id,
+					},
+				),
+				type: "user-invite",
+				no_save: true,
+			});
+
+			res.status(200).send();
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}
@@ -76,6 +127,14 @@ export class UserController {
 			const response = await this.signInUseCase.execute({
 				email,
 				password,
+			});
+
+			this.createNotificationUseCase.execute({
+				user_id: "6e161850-e0bf-4a13-8417-212dd796be2a",
+				title: "Novo usuário",
+				description: `Usuário "${name}" completou seu cadastro!`,
+				type: "done",
+				link: `/usuarios/${id}`,
 			});
 
 			res.status(200).json(response);

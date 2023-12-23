@@ -6,6 +6,8 @@ export class UserRepositoryImpl implements UserRepository {
 	constructor(private database: PrismaType) {}
 
 	async create(user: User): Promise<void> {
+		(user as any).activated_at = undefined;
+
 		try {
 			await this.database.user.create({
 				data: {
@@ -18,6 +20,8 @@ export class UserRepositoryImpl implements UserRepository {
 	}
 
 	async update(user: User): Promise<void> {
+		(user as any).invited_at = undefined;
+
 		try {
 			await this.database.user.update({
 				data: {

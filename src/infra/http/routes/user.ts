@@ -12,11 +12,18 @@ import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
 import { RoleMiddleware } from "../middlewares/role-middleware";
 import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
+import { NotificationRepositoryImpl } from "../../database/repositories/notification-repository-impl";
+import { mailSender } from "../../providers/nodemailer";
+import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
+import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 
 const routes = Router();
 
 const userRepository = new UserRepositoryImpl(prisma);
 const authRepository = new AuthRepositoryImpl(prisma);
+const notificationRepository = new NotificationRepositoryImpl(prisma);
+const emailRepository = new EmailRepositoryImpl(prisma, mailSender);
 
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
@@ -26,6 +33,12 @@ const getUserUseCase = new GetUserUseCase(userRepository);
 const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
 const uploadFileUseCase = new UploadFileUseCase();
 
+const createNotificationUseCase = new CreateNotificationUseCase(
+	notificationRepository,
+);
+
+const sendEmailUseCase = new SendEmailUseCase(emailRepository);
+
 const userController = new UserController(
 	createUserUseCase,
 	updateUserUseCase,
@@ -34,10 +47,16 @@ const userController = new UserController(
 	getUserUseCase,
 	getUserByEmailUseCase,
 	uploadFileUseCase,
+	createNotificationUseCase,
+	sendEmailUseCase,
 );
 
 routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.createUser(req, res);
+});
+
+routes.post("/invite/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
+	userController.inviteUser(req, res);
 });
 
 routes.put("/complete/:id", (req, res) => {

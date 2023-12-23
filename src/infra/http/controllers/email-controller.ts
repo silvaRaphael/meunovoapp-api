@@ -72,7 +72,6 @@ export class EmailController {
 			const { userId } = sendUserInviteMessageEmailSchema.parse(req.body);
 
 			await this.sendEmailUseCase.execute({
-				title: "Agradecemos pelo seu Contato",
 				from,
 				to,
 				subject,
@@ -113,6 +112,7 @@ export class EmailController {
 					},
 				),
 				type: "contact-message",
+				no_save: true,
 			});
 
 			res.status(200).send();

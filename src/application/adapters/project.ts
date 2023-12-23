@@ -19,6 +19,11 @@ export const createProjectSchema = z.object({
 		})
 		.max(500, { message: "A descrição deve ter ao máximo 500 digitos." })
 		.optional(),
+	budget: z
+		.number({
+			required_error: "Orçamento é necessário.",
+		})
+		.optional(),
 	status: z
 		.enum(["waiting", "in progress", "completed", "cancelled"], {
 			required_error: "Status é necessário.",

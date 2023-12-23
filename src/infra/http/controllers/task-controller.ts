@@ -49,25 +49,6 @@ export class TaskController {
 						description: `Tarefa "${name}" do projeto "${response.projectName}" foi criada!`,
 					});
 				}
-
-				if (user.userPreferences?.email_notification ?? true) {
-					this.sendEmailUseCase.execute({
-						from: process.env.EMAIL_SENDER || "",
-						to: [user.email],
-						subject: `Atualização de Projeto MeuNovoApp`,
-						html: replaceKeys<NotificationMessageTemplate>(
-							notificationMessageTemplate,
-							{
-								"[title]": `Criação de Tarefa: ${name}`,
-								"[name]": user.name || "",
-								"[description]": description || "",
-								"[projectName]": response.projectName,
-							},
-						),
-						type: "notification-message",
-						no_save: true,
-					});
-				}
 			});
 
 			res.status(200).send();

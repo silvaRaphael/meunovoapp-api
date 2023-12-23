@@ -30,14 +30,13 @@ export class ProjectController {
 
 	async createProject(req: Request, res: Response) {
 		try {
-			const { client_id, name, description, status, due } =
-				createProjectSchema.parse(req.body);
+			const { client_id, name, due } = createProjectSchema.parse(
+				req.body,
+			);
 
 			const response = await this.createProjectUseCase.execute({
 				client_id,
 				name,
-				description,
-				status,
 				due,
 			});
 
@@ -61,7 +60,7 @@ export class ProjectController {
 							{
 								"[title]": `Criação de Projeto: ${name}`,
 								"[name]": user.name || "",
-								"[description]": description || "",
+								"[description]": `Projeto "${name}" foi criado! Em breve receberá atualizações.`,
 								"[projectName]": name,
 							},
 						),
@@ -81,7 +80,7 @@ export class ProjectController {
 		try {
 			const { id } = updateProjectSchema.parse(req.params);
 
-			const { client_id, name, description, status, due } =
+			const { client_id, name, description, budget, status, due } =
 				createProjectSchema.parse(req.body);
 
 			const response = await this.updateProjectUseCase.execute({
@@ -89,6 +88,7 @@ export class ProjectController {
 				client_id,
 				name,
 				description,
+				budget,
 				status,
 				due,
 			});

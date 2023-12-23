@@ -20,6 +20,7 @@ export class CreateUserUseCase {
 				client_id,
 				role: "client",
 				is_manager,
+				invited_at: new Date(),
 			});
 
 			await this.userRepository.create(userToCreate);

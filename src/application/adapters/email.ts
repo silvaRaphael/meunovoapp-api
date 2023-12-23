@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { emailTypes } from "../../domain/email";
 
+export const validEmailSchema = z.object({
+	email: z
+		.string({
+			required_error: "E-mail é necessário.",
+		})
+		.email({
+			message: "E-mail válido é necessário.",
+		}),
+});
+export type ValidEmailSchema = z.infer<typeof validEmailSchema>;
+
 export const sendEmailSchema = z.object({
 	name: z
 		.string({

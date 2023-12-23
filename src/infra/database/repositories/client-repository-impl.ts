@@ -76,12 +76,19 @@ export class ClientRepositoryImpl implements ClientRepository {
 					cpf: true,
 					users: {
 						select: {
+							id: true,
 							name: true,
 							email: true,
 							is_manager: true,
 							avatar: true,
+							invited_at: true,
+							activated_at: true,
 						},
-						orderBy: { name: "asc" },
+						orderBy: [
+							{ is_manager: "desc" },
+							{ activated_at: "asc" },
+							{ invited_at: "asc" },
+						],
 					},
 					projects: {
 						select: {
