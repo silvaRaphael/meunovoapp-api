@@ -5,8 +5,28 @@ export interface ProjectFilter {
 }
 
 export interface ProjectRepository {
-	create(user: Project): Promise<{ userId: string }[]>;
-	update(user: Project): Promise<{ userId: string }[]>;
+	create(user: Project): Promise<{
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}>;
+	update(user: Project): Promise<{
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}>;
 	getAll(filters?: ProjectFilter): Promise<Project[]>;
 	getOne(id: string): Promise<Project | null>;
 }

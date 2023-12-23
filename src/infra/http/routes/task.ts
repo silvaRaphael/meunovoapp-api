@@ -10,11 +10,15 @@ import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { RoleMiddleware } from "../middlewares/role-middleware";
 import { NotificationRepositoryImpl } from "../../database/repositories/notification-repository-impl";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
+import { mailSender } from "../../providers/nodemailer";
+import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 
 const routes = Router();
 
 const taskRepository = new TaskRepositoryImpl(prisma);
 const notificationRepository = new NotificationRepositoryImpl(prisma);
+const emailRepository = new EmailRepositoryImpl(prisma, mailSender);
 
 const createTaskUseCase = new CreateTaskUseCase(taskRepository);
 const updateTaskUseCase = new UpdateTaskUseCase(taskRepository);
@@ -25,12 +29,15 @@ const createNotificationUseCase = new CreateNotificationUseCase(
 	notificationRepository,
 );
 
+const sendEmailUseCase = new SendEmailUseCase(emailRepository);
+
 const taskController = new TaskController(
 	createTaskUseCase,
 	updateTaskUseCase,
 	getAllTasksUseCase,
 	getTaskUseCase,
 	createNotificationUseCase,
+	sendEmailUseCase,
 );
 
 routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {

@@ -8,7 +8,18 @@ import { PrismaType } from "../prisma";
 export class TaskRepositoryImpl implements TaskRepository {
 	constructor(private database: PrismaType) {}
 
-	async create(task: Task): Promise<{ userId: string }[]> {
+	async create(task: Task): Promise<{
+		projectName: string;
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}> {
 		try {
 			const response = await this.database.task.create({
 				data: {
@@ -17,11 +28,23 @@ export class TaskRepositoryImpl implements TaskRepository {
 				select: {
 					project: {
 						select: {
+							name: true,
 							client: {
 								select: {
 									users: {
 										select: {
 											id: true,
+											name: true,
+											email: true,
+											userPreferences: {
+												select: {
+													console_notification: true,
+													email_notification: true,
+												},
+											},
+										},
+										where: {
+											password: { not: null },
 										},
 									},
 								},
@@ -31,17 +54,27 @@ export class TaskRepositoryImpl implements TaskRepository {
 				},
 			});
 
-			return (
-				response.project?.client?.users.map((item) => ({
-					userId: item.id,
-				})) ?? []
-			);
+			return {
+				projectName: response.project?.name || "",
+				users: response.project?.client?.users ?? [],
+			};
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
 	}
 
-	async update(task: Task): Promise<{ userId: string }[]> {
+	async update(task: Task): Promise<{
+		projectName: string;
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}> {
 		try {
 			const response = await this.database.task.update({
 				data: {
@@ -53,11 +86,23 @@ export class TaskRepositoryImpl implements TaskRepository {
 				select: {
 					project: {
 						select: {
+							name: true,
 							client: {
 								select: {
 									users: {
 										select: {
 											id: true,
+											name: true,
+											email: true,
+											userPreferences: {
+												select: {
+													console_notification: true,
+													email_notification: true,
+												},
+											},
+										},
+										where: {
+											password: { not: null },
 										},
 									},
 								},
@@ -67,11 +112,10 @@ export class TaskRepositoryImpl implements TaskRepository {
 				},
 			});
 
-			return (
-				response.project?.client?.users.map((item) => ({
-					userId: item.id,
-				})) ?? []
-			);
+			return {
+				projectName: response.project?.name || "",
+				users: response.project?.client?.users ?? [],
+			};
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}

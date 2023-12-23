@@ -6,6 +6,7 @@ export const emailTypes = [
 	"budget-message",
 	"budget-reply",
 	"user-invite",
+	"notification-message",
 ] as const;
 
 export type EmailType =
@@ -13,7 +14,8 @@ export type EmailType =
 	| "contact-reply"
 	| "budget-message"
 	| "budget-reply"
-	| "user-invite";
+	| "user-invite"
+	| "notification-message";
 
 export interface IEmail {
 	id?: string;

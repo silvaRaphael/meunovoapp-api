@@ -10,6 +10,12 @@ import {
 } from "../../../application/adapters/task";
 import { AuthRequest } from "../../config/auth-request";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import { replaceKeys } from "../utils/replace-keys";
+import {
+	NotificationMessageTemplate,
+	notificationMessageTemplate,
+} from "../../templates/notification-message-template";
+import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 
 export class TaskController {
 	constructor(
@@ -19,6 +25,7 @@ export class TaskController {
 		private getTaskUseCase: GetTaskUseCase,
 
 		private createNotificationUseCase: CreateNotificationUseCase,
+		private sendEmailUseCase: SendEmailUseCase,
 	) {}
 
 	async createTask(req: Request, res: Response) {
@@ -33,13 +40,34 @@ export class TaskController {
 				status,
 			});
 
-			response.forEach(({ userId }) => {
-				this.createNotificationUseCase.execute({
-					user_id: userId,
-					title: "Tarefa",
-					type: "pending",
-					description: `Tarefa "${name}" foi criada!`,
-				});
+			response.users.forEach((user) => {
+				if (user.userPreferences?.console_notification ?? true) {
+					this.createNotificationUseCase.execute({
+						user_id: user.id,
+						title: "Tarefa",
+						type: "pending",
+						description: `Tarefa "${name}" do projeto "${response.projectName}" foi criada!`,
+					});
+				}
+
+				if (user.userPreferences?.email_notification ?? true) {
+					this.sendEmailUseCase.execute({
+						from: process.env.EMAIL_SENDER || "",
+						to: [user.email],
+						subject: `Atualização de Projeto MeuNovoApp`,
+						html: replaceKeys<NotificationMessageTemplate>(
+							notificationMessageTemplate,
+							{
+								"[title]": `Criação de Tarefa: ${name}`,
+								"[name]": user.name || "",
+								"[description]": description || "",
+								"[projectName]": response.projectName,
+							},
+						),
+						type: "notification-message",
+						no_save: true,
+					});
+				}
 			});
 
 			res.status(200).send();
@@ -65,16 +93,41 @@ export class TaskController {
 			});
 
 			if (["in progress", "completed"].includes(status as any)) {
-				response.forEach(({ userId }) => {
-					this.createNotificationUseCase.execute({
-						user_id: userId,
-						title: "Tarefa",
-						type: status === "in progress" ? "started" : "done",
-						description: `Tarefa "${name}" foi ${
-							status === "in progress" ? "iniciada" : "finalizada"
-						}!`,
-						link: `/tarefas/${id}`,
-					});
+				response.users.forEach((user) => {
+					if (user.userPreferences?.console_notification ?? true) {
+						this.createNotificationUseCase.execute({
+							user_id: user.id,
+							title: "Tarefa",
+							type: status === "in progress" ? "started" : "done",
+							description: `Tarefa "${name}" do projeto "${
+								response.projectName
+							}" foi ${
+								status === "in progress"
+									? "atualizada"
+									: "finalizada"
+							}!`,
+							link: `/tarefas/${id}`,
+						});
+					}
+
+					if (user.userPreferences?.email_notification ?? true) {
+						this.sendEmailUseCase.execute({
+							from: process.env.EMAIL_SENDER || "",
+							to: [user.email],
+							subject: `Atualização de Projeto MeuNovoApp`,
+							html: replaceKeys<NotificationMessageTemplate>(
+								notificationMessageTemplate,
+								{
+									"[title]": `Atualização de Tarefa: ${name}`,
+									"[name]": user.name || "",
+									"[description]": description || "",
+									"[projectName]": response.projectName,
+								},
+							),
+							type: "notification-message",
+							no_save: true,
+						});
+					}
 				});
 			}
 

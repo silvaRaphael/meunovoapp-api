@@ -10,6 +10,12 @@ import {
 } from "../../../application/adapters/project";
 import { AuthRequest } from "../../config/auth-request";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
+import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
+import { replaceKeys } from "../utils/replace-keys";
+import {
+	NotificationMessageTemplate,
+	notificationMessageTemplate,
+} from "../../templates/notification-message-template";
 
 export class ProjectController {
 	constructor(
@@ -19,6 +25,7 @@ export class ProjectController {
 		private getProjectUseCase: GetProjectUseCase,
 
 		private createNotificationUseCase: CreateNotificationUseCase,
+		private sendEmailUseCase: SendEmailUseCase,
 	) {}
 
 	async createProject(req: Request, res: Response) {
@@ -34,13 +41,34 @@ export class ProjectController {
 				due,
 			});
 
-			response.forEach(({ userId }) => {
-				this.createNotificationUseCase.execute({
-					user_id: userId,
-					title: "Projeto",
-					description: `Projeto "${name}" foi criado!`,
-					type: "pending",
-				});
+			response.users.forEach((user) => {
+				if (user.userPreferences?.console_notification ?? true) {
+					this.createNotificationUseCase.execute({
+						user_id: user.id,
+						title: "Projeto",
+						description: `Projeto "${name}" foi criado!`,
+						type: "pending",
+					});
+				}
+
+				if (user.userPreferences?.email_notification ?? true) {
+					this.sendEmailUseCase.execute({
+						from: process.env.EMAIL_SENDER || "",
+						to: [user.email],
+						subject: `Criação de Projeto MeuNovoApp`,
+						html: replaceKeys<NotificationMessageTemplate>(
+							notificationMessageTemplate,
+							{
+								"[title]": `Criação de Projeto: ${name}`,
+								"[name]": user.name || "",
+								"[description]": description || "",
+								"[projectName]": name,
+							},
+						),
+						type: "notification-message",
+						no_save: true,
+					});
+				}
 			});
 
 			res.status(200).send();
@@ -66,16 +94,39 @@ export class ProjectController {
 			});
 
 			if (["in progress", "completed"].includes(status as any)) {
-				response.forEach(({ userId }) => {
-					this.createNotificationUseCase.execute({
-						user_id: userId,
-						title: "Projeto",
-						type: status === "in progress" ? "started" : "done",
-						description: `Projeto "${name}" foi ${
-							status === "in progress" ? "iniciado" : "finalizado"
-						}!`,
-						link: `/projetos/${id}`,
-					});
+				response.users.forEach((user) => {
+					if (user.userPreferences?.console_notification ?? true) {
+						this.createNotificationUseCase.execute({
+							user_id: user.id,
+							title: "Projeto",
+							type: status === "in progress" ? "started" : "done",
+							description: `Projeto "${name}" foi ${
+								status === "in progress"
+									? "atualizado"
+									: "finalizado"
+							}!`,
+							link: `/projetos/${id}`,
+						});
+					}
+
+					if (user.userPreferences?.email_notification ?? true) {
+						this.sendEmailUseCase.execute({
+							from: process.env.EMAIL_SENDER || "",
+							to: [user.email],
+							subject: `Atualização de Projeto MeuNovoApp`,
+							html: replaceKeys<NotificationMessageTemplate>(
+								notificationMessageTemplate,
+								{
+									"[title]": `Atualização de Projeto: ${name}`,
+									"[name]": user.name || "",
+									"[description]": description || "",
+									"[projectName]": name,
+								},
+							),
+							type: "notification-message",
+							no_save: true,
+						});
+					}
 				});
 			}
 

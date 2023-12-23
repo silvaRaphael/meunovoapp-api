@@ -8,7 +8,17 @@ import { PrismaType } from "../prisma";
 export class ProjectRepositoryImpl implements ProjectRepository {
 	constructor(private database: PrismaType) {}
 
-	async create(project: Project): Promise<{ userId: string }[]> {
+	async create(project: Project): Promise<{
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}> {
 		try {
 			const response = await this.database.project.create({
 				data: {
@@ -20,6 +30,17 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 							users: {
 								select: {
 									id: true,
+									name: true,
+									email: true,
+									userPreferences: {
+										select: {
+											console_notification: true,
+											email_notification: true,
+										},
+									},
+								},
+								where: {
+									password: { not: null },
 								},
 							},
 						},
@@ -27,16 +48,25 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 				},
 			});
 
-			return (
-				response.client?.users.map((item) => ({ userId: item.id })) ??
-				[]
-			);
+			return {
+				users: response.client?.users ?? [],
+			};
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
 	}
 
-	async update(project: Project): Promise<{ userId: string }[]> {
+	async update(project: Project): Promise<{
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}> {
 		try {
 			const response = await this.database.project.update({
 				data: {
@@ -51,6 +81,17 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 							users: {
 								select: {
 									id: true,
+									name: true,
+									email: true,
+									userPreferences: {
+										select: {
+											console_notification: true,
+											email_notification: true,
+										},
+									},
+								},
+								where: {
+									password: { not: null },
 								},
 							},
 						},
@@ -58,10 +99,9 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 				},
 			});
 
-			return (
-				response.client?.users.map((item) => ({ userId: item.id })) ??
-				[]
-			);
+			return {
+				users: response.client?.users ?? [],
+			};
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}

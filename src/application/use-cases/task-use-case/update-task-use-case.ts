@@ -5,9 +5,18 @@ import { TaskRepository } from "../../repositories/task-repository";
 export class UpdateTaskUseCase {
 	constructor(private taskRepository: TaskRepository) {}
 
-	async execute(
-		task: UpdateTaskSchema & CreateTaskSchema,
-	): Promise<{ userId: string }[]> {
+	async execute(task: UpdateTaskSchema & CreateTaskSchema): Promise<{
+		projectName: string;
+		users: {
+			id: string;
+			name: string | null;
+			email: string;
+			userPreferences: {
+				email_notification: boolean;
+				console_notification: boolean;
+			} | null;
+		}[];
+	}> {
 		try {
 			if (task.status === "in progress" && !task.startDate)
 				(task as Task).startDate = new Date();

@@ -45,6 +45,14 @@ export class AuthRepositoryImpl implements AuthRepository {
 				where: {
 					token,
 				},
+				select: {
+					id: true,
+					client_id: true,
+					role: true,
+					is_manager: true,
+					email: true,
+					token: true,
+				},
 			});
 
 			if (!response) return null;

@@ -148,3 +148,15 @@ export const replyBudgetMessageEmailSchema = z.object({
 export type ReplyBudgetMessageEmailSchema = z.infer<
 	typeof replyBudgetMessageEmailSchema
 >;
+
+export const notificationMessageEmailSchema = z.object({
+	projectName: z.string({
+		required_error: "Nome do projeto é necessário.",
+	}),
+	description: z.string({
+		required_error: "Descrição é necessária.",
+	}),
+});
+export type NotificationMessageEmailSchema = z.infer<
+	typeof notificationMessageEmailSchema
+>;
