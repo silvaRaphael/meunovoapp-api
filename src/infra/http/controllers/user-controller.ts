@@ -122,6 +122,7 @@ export class UserController {
 				email,
 				avatar: avatarPath,
 				password,
+				activated_at: new Date(),
 			});
 
 			const response = await this.signInUseCase.execute({
@@ -194,7 +195,6 @@ export class UserController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			console.error(error);
 			res.status(401).send({ error: HandleError(error) });
 		}
 	}

@@ -20,9 +20,18 @@ export class AuthController {
 				password,
 			});
 
-			(response as any).id = undefined;
-
-			res.status(200).json(response);
+			res.cookie("auth", response.token, {
+				httpOnly: true,
+				maxAge: 90 * 60000,
+				path: "/",
+			})
+				.status(200)
+				.json({
+					name: response.name,
+					email: response.email,
+					role: response.role,
+					avatar: response.avatar,
+				});
 		} catch (error: any) {
 			res.status(401).json({ error: HandleError(error) });
 		}
@@ -34,7 +43,7 @@ export class AuthController {
 
 			await this.signOutUseCase.execute(token);
 
-			res.status(200).send();
+			res.clearCookie("auth").status(200).send();
 		} catch (error: any) {
 			res.status(401).json({ error: HandleError(error) });
 		}

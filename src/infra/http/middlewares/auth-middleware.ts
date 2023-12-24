@@ -11,26 +11,22 @@ export const AuthMiddleware = async (
 	res: Response,
 	next: NextFunction,
 ) => {
-	const { authorization } = req.headers;
+	const { auth } = req.cookies;
 
 	try {
-		if (!authorization) throw new Error("Token não informado.");
+		if (!auth) throw new Error("Token não informado.");
 
-		const [, token] = authorization.split("Bearer ");
-
-		if (!token) throw new Error("Token não informado.");
-
-		const parsedToken = tokenSchema.parse(token);
+		const token = tokenSchema.parse(auth);
 
 		const response = await new ValidateTokenUseCase(
 			new AuthRepositoryImpl(prisma),
-		).execute(parsedToken);
+		).execute(token);
 
 		if (!response) throw new Error("Token expirado.");
 
 		if (response?.token !== token) throw new Error("Token expirado.");
 
-		(req as AuthRequest).token = parsedToken;
+		(req as AuthRequest).token = token;
 		(req as AuthRequest).userEmail = response.email;
 		(req as AuthRequest).userRole = response.role;
 		(req as AuthRequest).userIsManager = response.is_manager;
@@ -39,6 +35,8 @@ export const AuthMiddleware = async (
 
 		next();
 	} catch (error: any) {
-		res.status(401).send({ error: HandleError(error), redirect: "/login" });
+		res.clearCookie("auth")
+			.status(401)
+			.send({ error: HandleError(error), redirect: "/login" });
 	}
 };

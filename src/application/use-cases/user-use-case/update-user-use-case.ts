@@ -11,17 +11,17 @@ export class UpdateUserUseCase {
 		email,
 		avatar,
 		password,
+		activated_at,
 	}: { id: string } & UpdateUserSchema): Promise<void> {
 		try {
-			const userToUpdate = new User({
+			const userToUpdate = {
 				id,
 				name,
 				email,
 				avatar,
-				password,
-				role: "client",
-				activated_at: new Date(),
-			});
+				password: password ?? undefined,
+				activated_at: activated_at ?? undefined,
+			} as User;
 
 			await this.userRepository.update(userToUpdate);
 		} catch (error: any) {

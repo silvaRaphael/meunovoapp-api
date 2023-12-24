@@ -44,6 +44,7 @@ export class ClientRepositoryImpl implements ClientRepository {
 							is_manager: true,
 						},
 						select: {
+							id: true,
 							name: true,
 							email: true,
 							avatar: true,

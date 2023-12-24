@@ -20,8 +20,6 @@ export class UserRepositoryImpl implements UserRepository {
 	}
 
 	async update(user: User): Promise<void> {
-		(user as any).invited_at = undefined;
-
 		try {
 			await this.database.user.update({
 				data: {
@@ -38,7 +36,32 @@ export class UserRepositoryImpl implements UserRepository {
 
 	async getAll(): Promise<User[]> {
 		try {
-			const response = await this.database.user.findMany();
+			const response = await this.database.user.findMany({
+				where: {
+					role: { not: "master" },
+					password: { not: null },
+				},
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					is_manager: true,
+					avatar: true,
+					activated_at: true,
+					client: {
+						select: {
+							id: true,
+							company: true,
+							logotipo: true,
+						},
+					},
+				},
+				orderBy: [
+					{ is_manager: "desc" },
+					{ activated_at: "asc" },
+					{ invited_at: "asc" },
+				],
+			});
 
 			if (!response) return [];
 
@@ -55,9 +78,13 @@ export class UserRepositoryImpl implements UserRepository {
 					id,
 				},
 				select: {
+					id: true,
 					name: true,
 					email: true,
 					avatar: true,
+					is_manager: true,
+					invited_at: true,
+					activated_at: true,
 					notifications: true,
 					userPreferences: true,
 					client: {

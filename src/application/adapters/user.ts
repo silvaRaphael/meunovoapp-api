@@ -81,6 +81,11 @@ export const updateUserSchema = z
 			.min(5, { message: "Digite uma senha maior." })
 			.max(20, { message: "Digite uma senha menor." })
 			.optional(),
+		activated_at: z.coerce
+			.date({
+				required_error: "Data de ativação é necessária.",
+			})
+			.optional(),
 	})
 	.refine((data) => !data.password || (data.old_password && data.password), {
 		message: "Digite sua senha antiga.",
