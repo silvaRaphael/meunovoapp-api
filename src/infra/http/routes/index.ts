@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import auth from "./auth";
+import dashboard from "./dashboard";
 import email from "./email";
 import notifications from "./notification";
 import client from "./client";
@@ -12,6 +13,7 @@ import task from "./task";
 const routes = Router();
 
 routes.use("/auth", auth);
+routes.use("/dashboard", dashboard);
 routes.use("/emails", email);
 routes.use("/notifications", notifications);
 routes.use("/clients", client);

@@ -1,4 +1,7 @@
-import { UserRepository } from "../../../application/repositories/user-repository";
+import {
+	UserFilter,
+	UserRepository,
+} from "../../../application/repositories/user-repository";
 import { User } from "../../../domain/user";
 import { PrismaType } from "../prisma";
 
@@ -34,13 +37,9 @@ export class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	async getAll(): Promise<User[]> {
+	async getAll(filters?: UserFilter): Promise<User[]> {
 		try {
 			const response = await this.database.user.findMany({
-				where: {
-					role: { not: "master" },
-					password: { not: null },
-				},
 				select: {
 					id: true,
 					name: true,
@@ -55,6 +54,11 @@ export class UserRepositoryImpl implements UserRepository {
 							logotipo: true,
 						},
 					},
+				},
+				where: {
+					client_id: filters?.client_id,
+					role: { not: "master" },
+					password: { not: null },
 				},
 				orderBy: [
 					{ is_manager: "desc" },

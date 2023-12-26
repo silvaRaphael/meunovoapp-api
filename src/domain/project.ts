@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Status } from "../application/adapters/status";
+import { Task } from "./task";
 
 export interface IProject {
 	id?: string;
@@ -8,6 +9,7 @@ export interface IProject {
 	description?: string;
 	status?: Status;
 	budget?: number;
+	tasks?: Task[];
 	due: Date;
 }
 
@@ -18,6 +20,7 @@ export class Project {
 	description: string | null;
 	status: Status;
 	budget: number | null;
+	tasks?: Task[];
 	due: Date;
 
 	constructor({
