@@ -21,10 +21,8 @@ import {
 } from "../../templates/invite-user-message-template";
 import { replaceKeys } from "../utils/replace-keys";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
-import {
-	sendEmailSchema,
-	validEmailSchema,
-} from "../../../application/adapters/email";
+import { validEmailSchema } from "../../../application/adapters/email";
+import { DeleteFileUseCase } from "../../../application/use-cases/file-use-case/delete-file-use-case";
 
 export class UserController {
 	constructor(
@@ -35,6 +33,7 @@ export class UserController {
 		private getUserUseCase: GetUserUseCase,
 		private getUserByEmailUseCase: GetUserByEmailUseCase,
 		private uploadFileUseCase: UploadFileUseCase,
+		private deleteFileUseCase: DeleteFileUseCase,
 
 		private createNotificationUseCase: CreateNotificationUseCase,
 		private sendEmailUseCase: SendEmailUseCase,
@@ -174,6 +173,12 @@ export class UserController {
 				}).fileName;
 
 			if (!avatar) avatarPath = avatarName;
+
+			if (!avatarName)
+				this.getUserUseCase.execute(id).then((response) => {
+					if (response?.avatar)
+						this.deleteFileUseCase.execute(response.avatar);
+				});
 
 			await this.updateUserUseCase.execute({
 				id,

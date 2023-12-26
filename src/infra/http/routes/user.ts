@@ -17,6 +17,7 @@ import { mailSender } from "../../providers/nodemailer";
 import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
+import { DeleteFileUseCase } from "../../../application/use-cases/file-use-case/delete-file-use-case";
 
 const routes = Router();
 
@@ -32,6 +33,7 @@ const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
 const getUserUseCase = new GetUserUseCase(userRepository);
 const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
 const uploadFileUseCase = new UploadFileUseCase();
+const deleteFileUseCase = new DeleteFileUseCase();
 
 const createNotificationUseCase = new CreateNotificationUseCase(
 	notificationRepository,
@@ -47,6 +49,7 @@ const userController = new UserController(
 	getUserUseCase,
 	getUserByEmailUseCase,
 	uploadFileUseCase,
+	deleteFileUseCase,
 	createNotificationUseCase,
 	sendEmailUseCase,
 );
