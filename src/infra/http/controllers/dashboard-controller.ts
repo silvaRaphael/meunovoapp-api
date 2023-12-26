@@ -3,6 +3,7 @@ import { HandleError } from "../utils/handle-error";
 import { GetAllProjectsUseCase } from "../../../application/use-cases/project-use-case/get-all-projects-use-case";
 import { AuthRequest } from "../../config/auth-request";
 import { GetAllUsersUseCase } from "../../../application/use-cases/user-use-case/get-all-users-use-case";
+import { Task } from "../../../domain/task";
 
 export class DashboardController {
 	constructor(
@@ -22,11 +23,11 @@ export class DashboardController {
 
 			const projects = response.map((item) => {
 				const totalTasks =
-					item.tasks?.filter(
-						(item) => !["cancelled"].includes(item.status),
+					(item as any).tasks?.filter(
+						(item: Task) => !["cancelled"].includes(item.status),
 					).length || 0;
 				const doneTasks =
-					item.tasks?.filter((item) =>
+					(item as any).tasks?.filter((item: Task) =>
 						["completed"].includes(item.status),
 					).length || 0;
 
