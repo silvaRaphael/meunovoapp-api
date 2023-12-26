@@ -42,14 +42,13 @@ export class DashboardController {
 
 			res.status(200).json(projects);
 		} catch (error: any) {
-			console.error(error);
 			res.status(401).send({ error: HandleError(error) });
 		}
 	}
 
 	async getUsers(req: Request, res: Response) {
 		try {
-			const { clientId, userRole, userId } = req as AuthRequest;
+			const { clientId, userRole } = req as AuthRequest;
 
 			const filter = {};
 
@@ -58,12 +57,13 @@ export class DashboardController {
 			const response = await this.getAllUsersUseCase.execute(filter);
 
 			const users = response.map(
-				({ name, email, avatar, activated_at }) => {
+				({ name, email, avatar, activated_at, is_manager }) => {
 					return {
 						name,
 						email,
 						avatar,
 						activated_at,
+						is_manager,
 					};
 				},
 			);
