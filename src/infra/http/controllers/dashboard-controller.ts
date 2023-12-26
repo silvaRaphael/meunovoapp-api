@@ -57,16 +57,16 @@ export class DashboardController {
 
 			const response = await this.getAllUsersUseCase.execute(filter);
 
-			const users = response
-				.filter((item) => item.id !== userId)
-				.map(({ name, email, avatar, activated_at }) => {
+			const users = response.map(
+				({ name, email, avatar, activated_at }) => {
 					return {
 						name,
 						email,
 						avatar,
 						activated_at,
 					};
-				});
+				},
+			);
 
 			res.status(200).json(users);
 		} catch (error: any) {
