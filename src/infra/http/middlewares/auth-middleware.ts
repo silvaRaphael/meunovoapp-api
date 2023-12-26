@@ -14,7 +14,7 @@ export const AuthMiddleware = async (
 	const { auth } = req.cookies;
 
 	try {
-		if (!auth) throw new Error("Token não informado.");
+		if (!auth) throw new Error("Sessão expirada.");
 
 		const token = tokenSchema.parse(auth);
 
@@ -22,9 +22,9 @@ export const AuthMiddleware = async (
 			new AuthRepositoryImpl(prisma),
 		).execute(token);
 
-		if (!response) throw new Error("Token expirado.");
+		if (!response) throw new Error("Sessão expirada.");
 
-		if (response?.token !== token) throw new Error("Token expirado.");
+		if (response?.token !== token) throw new Error("Sessão expirada.");
 
 		(req as AuthRequest).token = token;
 		(req as AuthRequest).userEmail = response.email;
