@@ -21,8 +21,10 @@ model User {
   activated_at DateTime?
 
   client Client? @relation(fields: [client_id], references: [id])
+
   notifications Notification[]
   userPreferences UserPreferences?
+  chats Chat[]
 }
 
 model Email {
@@ -93,4 +95,16 @@ model UserPreferences {
   console_notification Boolean
 
   user User @relation(fields: [user_id], references: [id])
+}
+
+model Chat {
+	id String @id @unique 
+	user_id String
+	receiver_id String
+	text String
+	date DateTime?
+	read Boolean?
+	labels String[]
+
+  receiver User @relation(fields: [receiver_id], references: [id])
 }
