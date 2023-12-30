@@ -7,7 +7,10 @@ export class CreateChatUseCase {
 
 	async execute(chat: CreateChatSchema & { user_id: string }): Promise<void> {
 		try {
-			const chatToCreate = new Chat(chat);
+			const chatToCreate = new Chat({
+				id: chat.id,
+				participants_id: [chat.user_id, chat.receiver_id],
+			});
 
 			await this.chatRepository.create(chatToCreate);
 		} catch (error: any) {

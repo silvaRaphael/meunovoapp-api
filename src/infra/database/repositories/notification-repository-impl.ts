@@ -47,6 +47,7 @@ export class NotificationRepositoryImpl implements NotificationRepository {
 					read: false,
 				},
 				orderBy: { created_at: "desc" },
+				take: 20,
 			});
 
 			if (!response) return [];

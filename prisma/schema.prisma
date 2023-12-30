@@ -21,10 +21,12 @@ model User {
   activated_at DateTime?
 
   client Client? @relation(fields: [client_id], references: [id])
+  chatsAsParticipant1 Chat[] @relation("participant1Chats")
+  chatsAsParticipant2 Chat[] @relation("participant2Chats")
 
   notifications Notification[]
   userPreferences UserPreferences?
-  chats Chat[]
+  messages Message[]
 }
 
 model Email {
@@ -99,12 +101,24 @@ model UserPreferences {
 
 model Chat {
 	id String @id @unique 
+	participant1_id String
+	participant2_id String
+
+  participant1 User @relation("participant1Chats", fields: [participant1_id], references: [id])
+  participant2 User @relation("participant2Chats", fields: [participant2_id], references: [id])
+  
+  messages Message[]
+}
+
+model Message {
+	id String @id @unique 
+	chat_id String
 	user_id String
-	receiver_id String
 	text String
 	date DateTime?
 	read Boolean?
 	labels String[]
 
-  receiver User @relation(fields: [receiver_id], references: [id])
+  chat Chat @relation(fields: [chat_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }

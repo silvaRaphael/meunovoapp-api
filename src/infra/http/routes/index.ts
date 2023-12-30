@@ -10,6 +10,7 @@ import preferences from "./user-preferences";
 import project from "./project";
 import task from "./task";
 import chat from "./chat";
+import message from "./message";
 
 const routes = Router();
 
@@ -23,6 +24,7 @@ routes.use("/preferences", preferences);
 routes.use("/projects", project);
 routes.use("/tasks", task);
 routes.use("/chats", chat);
+routes.use("/messages", message);
 
 routes.get("/", (_, res) => res.end());
 

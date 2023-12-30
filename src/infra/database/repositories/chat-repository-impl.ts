@@ -10,7 +10,9 @@ export class ChatRepositoryImpl implements ChatRepository {
 		try {
 			await this.database.chat.create({
 				data: {
-					...chat,
+					id: chat.id,
+					participant1_id: chat.participants_id[0],
+					participant2_id: chat.participants_id[1],
 				},
 			});
 		} catch (error: any) {
@@ -18,45 +20,28 @@ export class ChatRepositoryImpl implements ChatRepository {
 		}
 	}
 
-	async markAsRead(id: string): Promise<void> {
-		try {
-			await this.database.notification.update({
-				data: {
-					read: true,
-				},
-				where: { id },
-			});
-		} catch (error: any) {
-			throw new Error("DB Error.");
-		}
-	}
-
-	async getOne(id: string): Promise<Chat | null> {
+	async getOne(chat_id: string): Promise<Chat | null> {
 		try {
 			const response = await this.database.chat.findFirst({
 				select: {
 					id: true,
-					text: true,
-					date: true,
-					read: true,
-					labels: true,
-					receiver: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-							avatar: true,
-							is_manager: true,
-						},
-					},
+					participant1_id: true,
+					participant2_id: true,
 				},
-				where: { id },
-				orderBy: { date: "desc" },
+				where: {
+					id: chat_id,
+				},
 			});
 
 			if (!response) return null;
 
-			return response as unknown as Chat;
+			return {
+				id: response.id,
+				participants_id: [
+					response.participant1_id,
+					response.participant2_id,
+				],
+			} as Chat;
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
@@ -87,72 +72,12 @@ export class ChatRepositoryImpl implements ChatRepository {
 		}
 	}
 
-	async getContacts(user_id: string): Promise<Chat[]> {
-		try {
-			const response = await this.database.user.findMany({
-				select: {
-					chats: {
-						select: {
-							id: true,
-							text: true,
-							date: true,
-							read: true,
-							labels: true,
-							receiver: {
-								select: {
-									id: true,
-									name: true,
-									email: true,
-									avatar: true,
-									is_manager: true,
-								},
-							},
-						},
-						orderBy: { date: "desc" },
-						take: 1,
-					},
-					name: true,
-				},
-				where: {
-					chats: {
-						some: {
-							OR: [{ user_id }, { receiver_id: user_id }],
-						},
-					},
-					id: user_id,
-				},
-			});
-
-			if (!response) return [];
-
-			return response[0].chats.map((item) => ({
-				...item,
-				user: {
-					id: user_id,
-					name: response[0].name,
-				},
-			})) as unknown as Chat[];
-		} catch (error: any) {
-			throw new Error("DB Error.");
-		}
-	}
-
-	async getMessages({
-		user_id,
-		receiver_id,
-	}: {
-		user_id: string;
-		receiver_id: string;
-	}): Promise<Chat[]> {
+	async getAll(user_id: string): Promise<Chat[]> {
 		try {
 			const response = await this.database.chat.findMany({
 				select: {
 					id: true,
-					text: true,
-					date: true,
-					read: true,
-					labels: true,
-					receiver: {
+					participant1: {
 						select: {
 							id: true,
 							name: true,
@@ -161,14 +86,42 @@ export class ChatRepositoryImpl implements ChatRepository {
 							is_manager: true,
 						},
 					},
+					participant2: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							avatar: true,
+							is_manager: true,
+						},
+					},
+					messages: {
+						orderBy: { date: "desc" },
+						take: 1,
+					},
 				},
-				where: { user_id, receiver_id },
-				orderBy: { date: "desc" },
+				where: {
+					OR: [
+						{ participant1_id: user_id },
+						{ participant2_id: user_id },
+					],
+				},
 			});
 
 			if (!response) return [];
 
-			return response as unknown as Chat[];
+			return response.map((item) => ({
+				id: item.id,
+				user:
+					item.participant1.id === user_id
+						? item.participant1
+						: item.participant2,
+				participant:
+					item.participant1.id === user_id
+						? item.participant2
+						: item.participant1,
+				last_message: item.messages.length ? item.messages[0] : null,
+			})) as Chat[];
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
