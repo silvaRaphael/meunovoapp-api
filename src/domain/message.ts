@@ -5,6 +5,15 @@ export type MessageLabel = "support" | "meeting" | "important";
 
 export const messageLabelTypes = ["support", "meeting", "important"] as const;
 
+export interface MessageUser {
+	id: string;
+	name: string;
+	email: string;
+	avatar?: string;
+	is_manager: boolean;
+	ws_token?: string;
+}
+
 export interface IMessage {
 	id?: string;
 	chat_id: string;

@@ -78,25 +78,30 @@ export class MessageRepositoryImpl implements MessageRepository {
 					},
 				},
 				where: { chat_id },
-				orderBy: { date: "asc" },
+				orderBy: { date: "desc" },
 				take: 50,
 			});
 
 			if (!response) return [];
 
-			return response.map((item) => ({
-				id: item.id,
-				chat_id: item.chat.id,
-				user: item.user,
-				participant:
-					item.chat.participant1.id === item.user.id
-						? item.chat.participant2
-						: item.chat.participant1,
-				date: item.date,
-				read: item.read,
-				text: item.text,
-				labels: item.labels,
-			})) as Message[];
+			return response
+				.map((item) => ({
+					id: item.id,
+					chat_id: item.chat.id,
+					user: item.user,
+					participant:
+						item.chat.participant1.id === item.user.id
+							? item.chat.participant2
+							: item.chat.participant1,
+					date: item.date,
+					read: item.read,
+					text: item.text,
+					labels: item.labels,
+				}))
+				.sort(
+					(a, b) =>
+						(a.date?.getTime() ?? 1) - (b.date?.getTime() ?? 1),
+				) as Message[];
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}
