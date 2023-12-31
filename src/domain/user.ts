@@ -13,6 +13,7 @@ export interface IUser {
 	client_id?: string;
 	is_manager?: boolean;
 	token?: string;
+	ws_token?: string;
 	invited_at?: Date;
 	activated_at?: Date;
 }
@@ -27,6 +28,7 @@ export class User {
 	client_id?: string | null;
 	is_manager: boolean;
 	token: string | null;
+	ws_token: string | null;
 	invited_at?: Date;
 	activated_at?: Date;
 
@@ -41,6 +43,7 @@ export class User {
 			client_id,
 			is_manager,
 			token,
+			ws_token,
 			invited_at,
 			activated_at,
 		}: IUser,
@@ -59,6 +62,7 @@ export class User {
 		this.client_id = client_id;
 		this.is_manager = is_manager || false;
 		this.token = token || null;
+		this.ws_token = ws_token || null;
 		this.invited_at = invited_at;
 		this.activated_at = activated_at;
 	}

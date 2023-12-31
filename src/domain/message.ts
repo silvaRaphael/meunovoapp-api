@@ -11,7 +11,7 @@ export interface MessageUser {
 	email: string;
 	avatar?: string;
 	is_manager: boolean;
-	ws_token?: string;
+	ws_token: string;
 }
 
 export interface IMessage {

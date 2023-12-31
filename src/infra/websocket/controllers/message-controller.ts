@@ -44,7 +44,7 @@ export class WSMessageController {
 				});
 			}
 
-			await this.createMessageUseCase.execute({
+			return await this.createMessageUseCase.execute({
 				user_id: id,
 				chat_id,
 				text,

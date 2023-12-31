@@ -35,7 +35,7 @@ routes.post("/", AuthMiddleware, (req, res) => {
 	messageController.createMessage(req, res);
 });
 
-routes.put("/:id", AuthMiddleware, (req, res) => {
+routes.put("/:chatId", AuthMiddleware, (req, res) => {
 	messageController.markAsRead(req, res);
 });
 

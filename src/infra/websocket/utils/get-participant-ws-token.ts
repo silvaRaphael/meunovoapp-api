@@ -1,6 +1,6 @@
 import { MessageUser } from "../../../domain/message";
 
-export function getParticipantWSToken(
+export function getOnlineParticipantWSToken(
 	chatIds: {
 		id: string;
 		participants_ws_token: string[];

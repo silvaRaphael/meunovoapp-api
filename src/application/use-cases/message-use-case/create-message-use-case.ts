@@ -7,7 +7,7 @@ export class CreateMessageUseCase {
 
 	async execute(
 		message: CreateMessageSchema & { user_id: string },
-	): Promise<void> {
+	): Promise<{ participant_id: string; ws_token: string | null }> {
 		try {
 			const messageToCreate = new Message({
 				id: message.id,
@@ -17,7 +17,7 @@ export class CreateMessageUseCase {
 				labels: message.labels,
 			});
 
-			await this.messageRepository.create(messageToCreate);
+			return await this.messageRepository.create(messageToCreate);
 		} catch (error: any) {
 			throw error;
 		}

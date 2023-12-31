@@ -37,6 +37,34 @@ export class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
+	async updateWSToken({
+		user_id,
+		ws_token,
+	}: {
+		user_id: string;
+		ws_token: string;
+	}): Promise<{ ws_token?: string }> {
+		try {
+			const response = await this.database.user.update({
+				data: {
+					ws_token,
+				},
+				where: {
+					id: user_id,
+				},
+				select: {
+					ws_token: true,
+				},
+			});
+
+			return {
+				ws_token: response.ws_token ?? undefined,
+			};
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
+
 	async getAll(filters?: UserFilter): Promise<User[]> {
 		try {
 			const response = await this.database.user.findMany({

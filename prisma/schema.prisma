@@ -17,6 +17,7 @@ model User {
   client_id String?
   is_manager Boolean?
   token    String?
+  ws_token    String?
   invited_at DateTime?
   activated_at DateTime?
 

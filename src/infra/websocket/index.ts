@@ -12,7 +12,10 @@ import { GetChatUseCase } from "../../application/use-cases/chat-use-case/get-ch
 import { MarkAsReadMessageUseCase } from "../../application/use-cases/message-use-case/mark-as-read-message-use-case";
 import { GetAllMessagesUseCase } from "../../application/use-cases/message-use-case/get-all-message-use-case";
 import { Message } from "../../domain/message";
-import { getParticipantWSToken } from "./utils/get-participant-ws-token";
+import { getOnlineParticipantWSToken } from "./utils/get-participant-ws-token";
+import { UserRepositoryImpl } from "../database/repositories/user-repository-impl";
+import { UpdateUserWSTokenUseCase } from "../../application/use-cases/user-use-case/update-ws-token-user-use-case";
+import { GetUserUseCase } from "../../application/use-cases/user-use-case/get-user-use-case";
 
 const io = new Server(server, {
 	cors: {
@@ -29,10 +32,14 @@ const io = new Server(server, {
 	},
 });
 
-const chatIds: {
+const onlineChatIds: {
 	id: string;
 	participants_ws_token: string[];
 }[] = [];
+
+const userRepository = new UserRepositoryImpl(prisma);
+
+const updateUserWSTokenUseCase = new UpdateUserWSTokenUseCase(userRepository);
 
 const messageRepository = new MessageRepositoryImpl(prisma);
 const chatRepository = new ChatRepositoryImpl(prisma);
@@ -53,15 +60,22 @@ const messageController = new WSMessageController(
 	getAllMessagesUseCase,
 );
 
-io.on("connection", (socket) => {
-	console.log("con");
+io.on("connection", async (socket) => {
+	const auth = await WSAuthMiddleware(socket);
+
+	if (!auth) return;
+
+	const { ws_token } = await updateUserWSTokenUseCase.execute({
+		user_id: auth.id,
+		ws_token: auth.ws_token,
+	});
 
 	socket.on("getMessages", async (chat_id) => {
 		const auth = await WSAuthMiddleware(socket);
 
 		if (!auth) return;
 
-		const myChatIds = chatIds
+		const myOnlineChatIds = onlineChatIds
 			.map((item) => {
 				return {
 					id: item.id,
@@ -72,18 +86,18 @@ io.on("connection", (socket) => {
 			})
 			.filter((item) => item.participants_ws_token.length);
 
-		chatIds.splice(0, chatIds.length);
+		onlineChatIds.splice(0, onlineChatIds.length);
 
-		myChatIds.forEach((item) => chatIds.push(item));
+		myOnlineChatIds.forEach((item) => onlineChatIds.push(item));
 
-		let chat = chatIds.find((item) => item.id === chat_id);
+		let chat = onlineChatIds.find((item) => item.id === chat_id);
 
 		const participants_ws_token: string[] = [];
 
 		if (!chat) {
 			if (auth.ws_token) participants_ws_token.push(auth.ws_token);
 
-			chatIds.push({
+			onlineChatIds.push({
 				id: chat_id,
 				participants_ws_token: [...participants_ws_token],
 			});
@@ -94,7 +108,7 @@ io.on("connection", (socket) => {
 				(item) => item === auth.ws_token,
 			);
 
-			if (!alreadyConnected && auth.ws_token)
+			if (!alreadyConnected)
 				chat.participants_ws_token.push(auth.ws_token);
 		}
 
@@ -113,18 +127,15 @@ io.on("connection", (socket) => {
 			});
 		}
 
-		const participant_ws_token = getParticipantWSToken(
-			chatIds,
+		const participant_ws_token = getOnlineParticipantWSToken(
+			onlineChatIds,
 			message.chat_id,
 			auth,
 		);
 
 		if (!participant_ws_token) return;
 
-		io.sockets.sockets.get(participant_ws_token)?.emit("messageRead", {
-			...message,
-			read: true,
-		});
+		io.sockets.sockets.get(participant_ws_token)?.emit("messageRead");
 	});
 
 	socket.on(
@@ -134,34 +145,64 @@ io.on("connection", (socket) => {
 
 			if (!auth) return;
 
-			messageController.createMessage(socket, auth, {
-				...message,
-				receiver_id,
-			});
+			const messageCreated = messageController.createMessage(
+				socket,
+				auth,
+				{
+					...message,
+					receiver_id,
+				},
+			);
 
-			const participant_ws_token = getParticipantWSToken(
-				chatIds,
+			const participant_ws_token = getOnlineParticipantWSToken(
+				onlineChatIds,
 				message.chat_id,
 				auth,
 			);
 
-			if (!participant_ws_token) return;
+			if (participant_ws_token) {
+				io.sockets.sockets.get(participant_ws_token)?.emit("message", {
+					...message,
+					read: true,
+				});
+			} else {
+				const messageCreatedParticipant = await messageCreated;
 
-			io.sockets.sockets
-				.get(participant_ws_token)
-				?.emit("message", message);
+				if (!messageCreatedParticipant) return;
+
+				const { participant_id, ws_token } = messageCreatedParticipant;
+
+				if (!participant_id || !ws_token) return;
+
+				io.sockets.sockets
+					.get(ws_token)
+					?.emit("offlineMessage", message);
+			}
 		},
 	);
 
-	socket.on("disconnect", () => {
-		console.log("dis");
-
-		const newChatIds = chatIds.filter(
+	socket.on("logoutChats", () => {
+		const newonlineChatIds = onlineChatIds.filter(
 			(item) => !item.participants_ws_token.includes(socket.id),
 		);
 
-		chatIds.splice(0, chatIds.length);
+		onlineChatIds.splice(0, onlineChatIds.length);
 
-		newChatIds.forEach((item) => chatIds.push(item));
+		newonlineChatIds.forEach((item) => onlineChatIds.push(item));
+	});
+
+	socket.on("disconnect", () => {
+		updateUserWSTokenUseCase.execute({
+			user_id: auth.id,
+			ws_token: null,
+		});
+
+		const newonlineChatIds = onlineChatIds.filter(
+			(item) => !item.participants_ws_token.includes(socket.id),
+		);
+
+		onlineChatIds.splice(0, onlineChatIds.length);
+
+		newonlineChatIds.forEach((item) => onlineChatIds.push(item));
 	});
 });

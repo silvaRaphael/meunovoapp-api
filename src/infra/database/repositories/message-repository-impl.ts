@@ -6,9 +6,11 @@ import { PrismaType } from "../prisma";
 export class MessageRepositoryImpl implements MessageRepository {
 	constructor(private database: PrismaType) {}
 
-	async create(message: Message): Promise<void> {
+	async create(
+		message: Message,
+	): Promise<{ participant_id: string; ws_token: string | null }> {
 		try {
-			await this.database.message.create({
+			const response = await this.database.message.create({
 				data: {
 					id: message.id,
 					chat_id: message.chat_id,
@@ -18,7 +20,35 @@ export class MessageRepositoryImpl implements MessageRepository {
 					read: message.read,
 					labels: message.labels,
 				},
+				select: {
+					chat: {
+						select: {
+							participant1: {
+								select: {
+									id: true,
+									ws_token: true,
+								},
+							},
+							participant2: {
+								select: {
+									id: true,
+									ws_token: true,
+								},
+							},
+						},
+					},
+				},
 			});
+
+			return response.chat.participant1.id !== message.user_id
+				? {
+						participant_id: response.chat.participant1.id,
+						ws_token: response.chat.participant1.ws_token,
+				  }
+				: {
+						participant_id: response.chat.participant2.id,
+						ws_token: response.chat.participant2.ws_token,
+				  };
 		} catch (error: any) {
 			console.log(error);
 			throw new Error("DB Error.");
@@ -37,7 +67,6 @@ export class MessageRepositoryImpl implements MessageRepository {
 				},
 			});
 		} catch (error: any) {
-			console.log(error);
 			throw new Error("DB Error.");
 		}
 	}
@@ -57,6 +86,7 @@ export class MessageRepositoryImpl implements MessageRepository {
 							name: true,
 							email: true,
 							avatar: true,
+							is_manager: true,
 						},
 					},
 					chat: {

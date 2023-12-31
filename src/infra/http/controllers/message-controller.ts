@@ -55,9 +55,17 @@ export class MessageController {
 
 	async markAsRead(req: Request, res: Response) {
 		try {
-			const { id } = updateMessageSchema.parse(req.params);
+			const { userId } = req as AuthRequest;
+			const { chat_id } = updateMessageSchema.parse({
+				chat_id: req.params.chatId,
+			});
 
-			await this.markAsReadMessageUseCase.execute(id);
+			if (!userId) throw new Error("Usuário não encontrado.");
+
+			await this.markAsReadMessageUseCase.execute({
+				user_id: userId,
+				chat_id,
+			});
 
 			res.status(200).send();
 		} catch (error: any) {
