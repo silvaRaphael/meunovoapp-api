@@ -54,31 +54,12 @@ const messageController = new WSMessageController(
 );
 
 io.on("connection", (socket) => {
+	console.log("con");
+
 	socket.on("getMessages", async (chat_id) => {
 		const auth = await WSAuthMiddleware(socket);
 
 		if (!auth) return;
-
-		// let myChatIds = chatIds.filter((item) =>
-		// 	item.participants_ws_token.includes(socket.id),
-		// );
-
-		// myChatIds = myChatIds.filter((item) => item.id !== chat_id);
-
-		// chatIds.map((item) => {
-		// 	const myChat = myChatIds.find((chat) => chat.id === item.id);
-
-		// 	if (myChat) {
-		// 		return {
-		// 			id: myChat.id,
-		// 			participants_ws_token: myChat.participants_ws_token.filter(
-		// 				(participant) => participant !== socket.id,
-		// 			),
-		// 		};
-		// 	}
-
-		// 	return item;
-		// });
 
 		const myChatIds = chatIds
 			.map((item) => {
@@ -118,9 +99,6 @@ io.on("connection", (socket) => {
 		}
 
 		messageController.getMessages(socket, chat_id);
-
-		console.log(chatIds);
-		console.log(auth.ws_token);
 	});
 
 	socket.on("markAsRead", async (message: Message) => {
@@ -128,7 +106,12 @@ io.on("connection", (socket) => {
 
 		if (!auth) return;
 
-		messageController.markAsRead(socket, message.id);
+		if (message.user?.id) {
+			messageController.markAsRead(socket, {
+				chat_id: message.chat_id,
+				user_id: message.user?.id,
+			});
+		}
 
 		const participant_ws_token = getParticipantWSToken(
 			chatIds,
@@ -138,38 +121,40 @@ io.on("connection", (socket) => {
 
 		if (!participant_ws_token) return;
 
-		io.sockets.sockets
-			.get(participant_ws_token)
-			?.emit("messageRead", message);
+		io.sockets.sockets.get(participant_ws_token)?.emit("messageRead", {
+			...message,
+			read: true,
+		});
 	});
 
-	socket.on("createMessage", async (message: Message) => {
-		const auth = await WSAuthMiddleware(socket);
+	socket.on(
+		"createMessage",
+		async (message: Message, receiver_id?: string) => {
+			const auth = await WSAuthMiddleware(socket);
 
-		if (!auth) return;
+			if (!auth) return;
 
-		messageController.createMessage(socket, auth, message);
+			messageController.createMessage(socket, auth, {
+				...message,
+				receiver_id,
+			});
 
-		const participant_ws_token = getParticipantWSToken(
-			chatIds,
-			message.chat_id,
-			auth,
-		);
+			const participant_ws_token = getParticipantWSToken(
+				chatIds,
+				message.chat_id,
+				auth,
+			);
 
-		if (!participant_ws_token) return;
+			if (!participant_ws_token) return;
 
-		// console.log(
-		// 	"participant_ws_token",
-		// 	participant_ws_token,
-		// 	chatIds.find((item) => item.id === message.chat_id)
-		// 		?.participants_ws_token,
-		// );
-
-		io.sockets.sockets.get(participant_ws_token)?.emit("message", message);
-	});
+			io.sockets.sockets
+				.get(participant_ws_token)
+				?.emit("message", message);
+		},
+	);
 
 	socket.on("disconnect", () => {
-		console.log("disconnected");
+		console.log("dis");
 
 		const newChatIds = chatIds.filter(
 			(item) => !item.participants_ws_token.includes(socket.id),

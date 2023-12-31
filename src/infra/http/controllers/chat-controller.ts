@@ -33,11 +33,14 @@ export class ChatController {
 
 	async getUsers(req: Request, res: Response) {
 		try {
-			const { userId } = req as AuthRequest;
+			const { userId, clientId, userRole } = req as AuthRequest;
 
 			if (!userId) throw new Error("Usuário não encontrado.");
 
-			const response = await this.getUsersChatUseCase.execute(userId);
+			const response = await this.getUsersChatUseCase.execute({
+				user_id: userId,
+				client_id: userRole === "master" ? undefined : clientId,
+			});
 
 			res.status(200).json(response);
 		} catch (error: any) {

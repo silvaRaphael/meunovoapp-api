@@ -65,7 +65,7 @@ export class UserController {
 				no_save: true,
 			});
 
-			res.status(200).send();
+			res.status(200).send(response);
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}

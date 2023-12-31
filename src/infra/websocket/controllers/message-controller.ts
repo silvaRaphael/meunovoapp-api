@@ -1,5 +1,6 @@
 import {
 	CreateMessageSchema,
+	UpdateMessageSchema,
 	createMessageSchema,
 	updateMessageSchema,
 } from "../../../application/adapters/message";
@@ -54,11 +55,14 @@ export class WSMessageController {
 		}
 	}
 
-	async markAsRead(socket: Socket, message_id: string) {
+	async markAsRead(socket: Socket, message: UpdateMessageSchema) {
 		try {
-			const { id } = updateMessageSchema.parse({ id: message_id });
+			const { chat_id, user_id } = updateMessageSchema.parse(message);
 
-			await this.markAsReadMessageUseCase.execute(id);
+			await this.markAsReadMessageUseCase.execute({
+				chat_id,
+				user_id,
+			});
 		} catch (error: any) {
 			socket.emit("error", { error: HandleError(error) });
 		}

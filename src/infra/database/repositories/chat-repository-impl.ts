@@ -47,7 +47,21 @@ export class ChatRepositoryImpl implements ChatRepository {
 		}
 	}
 
-	async getUsers(user_id: string): Promise<User[]> {
+	async getUsers(filter: {
+		user_id: string;
+		client_id?: string;
+	}): Promise<User[]> {
+		const where = {
+			activated_at: { not: null },
+			id: { not: filter.user_id },
+		};
+
+		if (filter.client_id)
+			(where as any).OR = [
+				{ client_id: filter.client_id },
+				{ role: "master" },
+			];
+
 		try {
 			const response = await this.database.user.findMany({
 				select: {
@@ -57,10 +71,7 @@ export class ChatRepositoryImpl implements ChatRepository {
 					avatar: true,
 					is_manager: true,
 				},
-				where: {
-					activated_at: { not: null },
-					id: { not: user_id },
-				},
+				where,
 				orderBy: { name: "asc" },
 			});
 
@@ -110,18 +121,26 @@ export class ChatRepositoryImpl implements ChatRepository {
 
 			if (!response) return [];
 
-			return response.map((item) => ({
-				id: item.id,
-				user:
-					item.participant1.id === user_id
-						? item.participant1
-						: item.participant2,
-				participant:
-					item.participant1.id === user_id
-						? item.participant2
-						: item.participant1,
-				last_message: item.messages.length ? item.messages[0] : null,
-			})) as Chat[];
+			return response
+				.map((item) => ({
+					id: item.id,
+					user:
+						item.participant1.id === user_id
+							? item.participant1
+							: item.participant2,
+					participant:
+						item.participant1.id === user_id
+							? item.participant2
+							: item.participant1,
+					last_message: item.messages.length
+						? item.messages[0]
+						: null,
+				}))
+				.sort(
+					(a, b) =>
+						(b?.last_message?.date?.getTime() ?? 1) -
+						(a?.last_message?.date?.getTime() ?? 1),
+				) as Chat[];
 		} catch (error: any) {
 			throw new Error("DB Error.");
 		}

@@ -4,9 +4,12 @@ import { ChatRepository } from "../../repositories/chat-repository";
 export class GetUsersChatUseCase {
 	constructor(private chatRepository: ChatRepository) {}
 
-	async execute(user_id: string): Promise<User[]> {
+	async execute(filter: {
+		user_id: string;
+		client_id?: string;
+	}): Promise<User[]> {
 		try {
-			return await this.chatRepository.getUsers(user_id);
+			return await this.chatRepository.getUsers(filter);
 		} catch (error: any) {
 			throw error;
 		}

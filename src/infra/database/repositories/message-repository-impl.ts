@@ -1,3 +1,4 @@
+import { UpdateMessageSchema } from "../../../application/adapters/message";
 import { MessageRepository } from "../../../application/repositories/message-repository";
 import { Message } from "../../../domain/message";
 import { PrismaType } from "../prisma";
@@ -19,19 +20,24 @@ export class MessageRepositoryImpl implements MessageRepository {
 				},
 			});
 		} catch (error: any) {
+			console.log(error);
 			throw new Error("DB Error.");
 		}
 	}
 
-	async markAsRead(id: string): Promise<void> {
+	async markAsRead(message: UpdateMessageSchema): Promise<void> {
 		try {
-			await this.database.message.update({
+			await this.database.message.updateMany({
 				data: {
 					read: true,
 				},
-				where: { id },
+				where: {
+					chat_id: message.chat_id,
+					user_id: message.user_id,
+				},
 			});
 		} catch (error: any) {
+			console.log(error);
 			throw new Error("DB Error.");
 		}
 	}

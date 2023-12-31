@@ -2,6 +2,14 @@ import { z } from "zod";
 import { messageLabelTypes } from "../../domain/message";
 
 export const createMessageSchema = z.object({
+	id: z
+		.string({
+			required_error: "ID é necessário.",
+		})
+		.uuid({
+			message: "ID válido é necessário.",
+		})
+		.optional(),
 	chat_id: z
 		.string({
 			required_error: "ID é necessário.",
@@ -33,7 +41,14 @@ export const createMessageSchema = z.object({
 export type CreateMessageSchema = z.infer<typeof createMessageSchema>;
 
 export const updateMessageSchema = z.object({
-	id: z
+	chat_id: z
+		.string({
+			required_error: "ID é necessário.",
+		})
+		.uuid({
+			message: "ID válido é necessário.",
+		}),
+	user_id: z
 		.string({
 			required_error: "ID é necessário.",
 		})
