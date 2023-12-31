@@ -142,4 +142,42 @@ export class MessageRepositoryImpl implements MessageRepository {
 			throw new Error("DB Error.");
 		}
 	}
+
+	async getNotifications(user_id: string): Promise<Message[]> {
+		try {
+			const response = await this.database.message.findMany({
+				select: {
+					id: true,
+					text: true,
+					date: true,
+					labels: true,
+					user: {
+						select: {
+							name: true,
+						},
+					},
+				},
+				where: {
+					user_id: { not: user_id },
+					chat: {
+						OR: [
+							{ participant1_id: user_id },
+							{ participant2_id: user_id },
+						],
+					},
+					read: false,
+				},
+				orderBy: { date: "desc" },
+				take: 20,
+			});
+
+			if (!response) return [];
+
+			return response.sort(
+				(a, b) => (a.date?.getTime() ?? 1) - (b.date?.getTime() ?? 1),
+			) as Message[];
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
 }

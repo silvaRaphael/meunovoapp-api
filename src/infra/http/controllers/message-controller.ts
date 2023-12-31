@@ -10,6 +10,7 @@ import { GetAllMessagesUseCase } from "../../../application/use-cases/message-us
 import { CreateMessageUseCase } from "../../../application/use-cases/message-use-case/create-message-use-case";
 import { CreateChatUseCase } from "../../../application/use-cases/chat-use-case/create-chat-use-case";
 import { GetChatUseCase } from "../../../application/use-cases/chat-use-case/get-chat-use-case";
+import { GetMeessageNotificationsUseCase } from "../../../application/use-cases/message-use-case/get-message-notifications-use-case";
 
 export class MessageController {
 	constructor(
@@ -18,6 +19,7 @@ export class MessageController {
 		private getChatUseCase: GetChatUseCase,
 		private markAsReadMessageUseCase: MarkAsReadMessageUseCase,
 		private getAllMessagesUseCase: GetAllMessagesUseCase,
+		private getMeessageNotificationsUseCase: GetMeessageNotificationsUseCase,
 	) {}
 
 	async createMessage(req: Request, res: Response) {
@@ -81,6 +83,22 @@ export class MessageController {
 			if (!userId) throw new Error("Usuário não encontrado.");
 
 			const response = await this.getAllMessagesUseCase.execute(chatId);
+
+			res.status(200).json(response);
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
+	async getMessageNotifications(req: Request, res: Response) {
+		try {
+			const { userId } = req as AuthRequest;
+
+			if (!userId) throw new Error("Usuário não encontrado.");
+
+			const response = await this.getMeessageNotificationsUseCase.execute(
+				userId,
+			);
 
 			res.status(200).json(response);
 		} catch (error: any) {
