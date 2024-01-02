@@ -114,6 +114,7 @@ export class UserRepositoryImpl implements UserRepository {
 					name: true,
 					email: true,
 					avatar: true,
+					password: true,
 					is_manager: true,
 					invited_at: true,
 					activated_at: true,
@@ -145,6 +146,24 @@ export class UserRepositoryImpl implements UserRepository {
 			const response = await this.database.user.findFirst({
 				where: {
 					email,
+				},
+			});
+
+			if (!response) return null;
+
+			return response as unknown as User;
+		} catch (error: any) {
+			throw new Error("DB Error.");
+		}
+	}
+
+	async getOneByPasswordKey(key: string): Promise<User | null> {
+		try {
+			const response = await this.database.user.findFirst({
+				where: {
+					password: {
+						endsWith: key,
+					},
 				},
 			});
 

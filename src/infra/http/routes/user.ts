@@ -18,6 +18,7 @@ import { EmailRepositoryImpl } from "../../database/repositories/email-repositor
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 import { DeleteFileUseCase } from "../../../application/use-cases/file-use-case/delete-file-use-case";
+import { GetUserByPasswordKeyUseCase } from "../../../application/use-cases/user-use-case/get-user-by-password-key-use-case";
 
 const routes = Router();
 
@@ -32,6 +33,9 @@ const signInUseCase = new SignInUseCase(authRepository, userRepository);
 const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
 const getUserUseCase = new GetUserUseCase(userRepository);
 const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
+const getUserByPasswordKeyUseCase = new GetUserByPasswordKeyUseCase(
+	userRepository,
+);
 const uploadFileUseCase = new UploadFileUseCase();
 const deleteFileUseCase = new DeleteFileUseCase();
 
@@ -48,6 +52,7 @@ const userController = new UserController(
 	getAllUsersUseCase,
 	getUserUseCase,
 	getUserByEmailUseCase,
+	getUserByPasswordKeyUseCase,
 	uploadFileUseCase,
 	deleteFileUseCase,
 	createNotificationUseCase,
@@ -56,6 +61,18 @@ const userController = new UserController(
 
 routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
 	userController.createUser(req, res);
+});
+
+routes.post("/reset-password", (req, res) => {
+	userController.resetPassword(req, res);
+});
+
+routes.put("/reset-password/:key", (req, res) => {
+	userController.updatePassword(req, res);
+});
+
+routes.get("/can-reset-password/:key", (req, res) => {
+	userController.canResetPassword(req, res);
 });
 
 routes.post("/invite/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
@@ -89,6 +106,7 @@ routes.get("/can-update/:id", (req, res) => {
 routes.post("/can-use-email", AuthMiddleware, (req, res) => {
 	userController.canUseEmail(req, res);
 });
+
 routes.post("/can-use-email/:id", (req, res) => {
 	userController.canUseEmail(req, res);
 });

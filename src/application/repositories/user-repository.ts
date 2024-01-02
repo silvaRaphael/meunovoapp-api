@@ -17,4 +17,5 @@ export interface UserRepository {
 	getAll(filters?: UserFilter): Promise<User[]>;
 	getOne(id: string): Promise<User | null>;
 	getOneByEmail(email: string): Promise<User | null>;
+	getOneByPasswordKey(key: string): Promise<User | null>;
 }

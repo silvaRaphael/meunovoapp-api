@@ -150,9 +150,7 @@ export class TaskRepositoryImpl implements TaskRepository {
 					},
 					status: { not: "cancelled" },
 				},
-				orderBy: {
-					startDate: "asc",
-				},
+				orderBy: [{ status: "desc" }, { startDate: "asc" }],
 			});
 
 			if (!response) return [];

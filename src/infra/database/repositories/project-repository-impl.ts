@@ -133,7 +133,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 					client_id: filters?.client_id,
 					status: { not: "cancelled" },
 				},
-				orderBy: { due: "asc" },
+				orderBy: { due: "desc" },
 			});
 
 			if (!response) return [];
@@ -173,6 +173,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 						where: {
 							status: { not: "cancelled" },
 						},
+						orderBy: [{ status: "desc" }, { startDate: "asc" }],
 					},
 				},
 			});

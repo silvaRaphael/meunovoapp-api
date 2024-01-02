@@ -1,3 +1,4 @@
+import { hashSync } from "bcrypt";
 import { User } from "../../../domain/user";
 import { UpdateUserSchema } from "../../adapters/user";
 import { UserRepository } from "../../repositories/user-repository";
@@ -19,7 +20,7 @@ export class UpdateUserUseCase {
 				name,
 				email,
 				avatar,
-				password: password ?? undefined,
+				password: password ? hashSync(password, 8) : undefined,
 				activated_at: activated_at ?? undefined,
 			} as User;
 

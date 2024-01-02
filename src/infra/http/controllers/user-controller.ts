@@ -9,6 +9,7 @@ import {
 	createUserSchema,
 	completeUserSchema,
 	updateUserSchema,
+	updatePasswordSchema,
 } from "../../../application/adapters/user";
 import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
 import { GetUserByEmailUseCase } from "../../../application/use-cases/user-use-case/get-user-by-email-use-case";
@@ -23,6 +24,12 @@ import { replaceKeys } from "../utils/replace-keys";
 import { CreateNotificationUseCase } from "../../../application/use-cases/notification-use-case/create-notification-use-case";
 import { validEmailSchema } from "../../../application/adapters/email";
 import { DeleteFileUseCase } from "../../../application/use-cases/file-use-case/delete-file-use-case";
+import {
+	ResetPasswordMessageTemplate,
+	resetPasswordMessageTemplate,
+} from "../../templates/reset-password-template";
+import { genPasswordKey } from "../utils/gen-password-key";
+import { GetUserByPasswordKeyUseCase } from "../../../application/use-cases/user-use-case/get-user-by-password-key-use-case";
 
 export class UserController {
 	constructor(
@@ -32,6 +39,7 @@ export class UserController {
 		private getAllUsersUseCase: GetAllUsersUseCase,
 		private getUserUseCase: GetUserUseCase,
 		private getUserByEmailUseCase: GetUserByEmailUseCase,
+		private getUserByPasswordKeyUseCase: GetUserByPasswordKeyUseCase,
 		private uploadFileUseCase: UploadFileUseCase,
 		private deleteFileUseCase: DeleteFileUseCase,
 
@@ -66,6 +74,49 @@ export class UserController {
 			});
 
 			res.status(200).send(response);
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
+	async resetPassword(req: Request, res: Response) {
+		try {
+			const { email } = validEmailSchema.parse(req.body);
+
+			const user = await this.getUserByEmailUseCase.execute(email);
+
+			if (!user) throw new Error("Usuário não encontrado.");
+
+			if (!user.password)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			const passwordResetKey = genPasswordKey(user.password);
+
+			if (!passwordResetKey)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			await this.sendEmailUseCase.execute({
+				from: process.env.EMAIL_SENDER || "",
+				to: [email],
+				subject:
+					"Solicitação de recuperação de senha de conta MeuNovoApp",
+				html: replaceKeys<ResetPasswordMessageTemplate>(
+					resetPasswordMessageTemplate,
+					{
+						"[resetPasswordKey]":
+							encodeURIComponent(passwordResetKey),
+						"[name]": user.name || "",
+					},
+				),
+				type: "user-invite",
+				no_save: true,
+			});
+
+			res.status(200).send();
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}
@@ -194,6 +245,43 @@ export class UserController {
 		}
 	}
 
+	async updatePassword(req: Request, res: Response) {
+		try {
+			const { key } = req.params;
+			const { password } = updatePasswordSchema.parse(req.body);
+
+			const user = await this.getUserByPasswordKeyUseCase.execute(key);
+
+			if (!user) throw new Error("Chave de recuperação inválida.");
+
+			if (!user.password)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			const passwordResetKey = genPasswordKey(user.password);
+
+			if (!passwordResetKey)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			if (passwordResetKey !== key)
+				throw new Error("Chave de recuperação inválida.");
+
+			await this.updateUserUseCase.execute({
+				id: user.id,
+				name: user.name || "",
+				email: user.email,
+				password,
+			});
+
+			res.status(200).send();
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
 	async getAllUsers(req: Request, res: Response) {
 		try {
 			const response = await this.getAllUsersUseCase.execute();
@@ -208,9 +296,11 @@ export class UserController {
 		try {
 			const { id } = req.params;
 
-			const response = await this.getUserUseCase.execute(id);
+			const user = await this.getUserUseCase.execute(id);
 
-			res.status(200).json(response);
+			(user as any).password = undefined;
+
+			res.status(200).json(user);
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}
@@ -222,9 +312,40 @@ export class UserController {
 
 			if (!id) throw new Error("ID é necessário");
 
-			const response = await this.getUserUseCase.execute(id);
+			const user = await this.getUserUseCase.execute(id);
 
-			res.status(200).json(response);
+			(user as any).password = undefined;
+
+			res.status(200).json(user);
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error) });
+		}
+	}
+
+	async canResetPassword(req: Request, res: Response) {
+		try {
+			const { key } = req.params;
+
+			const user = await this.getUserByPasswordKeyUseCase.execute(key);
+
+			if (!user) throw new Error("Chave de recuperação inválida.");
+
+			if (!user.password)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			const passwordResetKey = genPasswordKey(user.password);
+
+			if (!passwordResetKey)
+				throw new Error(
+					"Usuário inativo. Complete seu perfil primeiro.",
+				);
+
+			if (passwordResetKey !== key)
+				throw new Error("Chave de recuperação inválida.");
+
+			res.status(200).send();
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
 		}
@@ -234,14 +355,14 @@ export class UserController {
 		try {
 			const { id } = req.params;
 
-			const response = await this.getUserUseCase.execute(id);
+			const user = await this.getUserUseCase.execute(id);
 
-			if (!response) throw new Error("Usuário não existe.");
+			if (!user) throw new Error("Usuário não existe.");
 
-			if (response?.password) throw new Error("Usuário já cadastrado.");
+			if (user?.password) throw new Error("Usuário já cadastrado.");
 
 			res.status(200).json({
-				email: response.email,
+				email: user.email,
 			});
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error) });
@@ -253,10 +374,9 @@ export class UserController {
 			const id = req.params.id || (req as AuthRequest).userId;
 			const { email } = req.body;
 
-			const response = await this.getUserByEmailUseCase.execute(email);
+			const user = await this.getUserByEmailUseCase.execute(email);
 
-			if (response && response.id !== id)
-				throw new Error("E-mail já em uso.");
+			if (user && user.id !== id) throw new Error("E-mail já em uso.");
 
 			res.status(200).send();
 		} catch (error: any) {
