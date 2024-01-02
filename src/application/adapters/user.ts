@@ -97,13 +97,11 @@ export const updatePasswordSchema = z
 		password: z
 			.string({ required_error: "Senha é necessária." })
 			.min(5, { message: "Digite uma senha maior." })
-			.max(20, { message: "Digite uma senha menor." })
-			.optional(),
+			.max(20, { message: "Digite uma senha menor." }),
 		confirm_password: z
 			.string({ required_error: "Confirmação de senha é necessária." })
 			.min(5, { message: "Digite uma senha maior." })
-			.max(20, { message: "Digite uma senha menor." })
-			.optional(),
+			.max(20, { message: "Digite uma senha menor." }),
 	})
 	.refine((data) => data.password === data.confirm_password, {
 		message: "As senhas não são iguais.",
