@@ -41,7 +41,7 @@ export const WSAuthMiddleware = async (
 		};
 	} catch (error: any) {
 		socket.emit("error", {
-			error: HandleError(error, req),
+			error: HandleError(error),
 			redirect: "/login",
 		});
 	}
