@@ -42,7 +42,7 @@ export class DashboardController {
 
 			res.status(200).json(projects);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -70,7 +70,7 @@ export class DashboardController {
 
 			res.status(200).json(users);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

@@ -33,7 +33,7 @@ export class AuthController {
 					avatar: response.avatar,
 				});
 		} catch (error: any) {
-			res.status(401).json({ error: HandleError(error) });
+			res.status(401).json({ error: HandleError(error, req) });
 		}
 	}
 
@@ -45,7 +45,7 @@ export class AuthController {
 
 			res.clearCookie("auth").status(200).send();
 		} catch (error: any) {
-			res.status(401).json({ error: HandleError(error) });
+			res.status(401).json({ error: HandleError(error, req) });
 		}
 	}
 }

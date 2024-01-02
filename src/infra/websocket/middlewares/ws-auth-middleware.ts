@@ -5,6 +5,7 @@ import { AuthRepositoryImpl } from "../../database/repositories/auth-repository-
 import { prisma } from "../../database/prisma";
 import { Socket } from "socket.io";
 import { MessageUser } from "../../../domain/message";
+import { SessionExpiredError } from "../../../application/errors";
 
 export const WSAuthMiddleware = async (
 	socket: Socket,
@@ -18,7 +19,7 @@ export const WSAuthMiddleware = async (
 	const auth = cookie?.replace("auth=", "").trim();
 
 	try {
-		if (!auth) throw new Error("Sessão expirada.");
+		if (!auth) throw new SessionExpiredError();
 
 		const token = tokenSchema.parse(auth);
 
@@ -26,9 +27,9 @@ export const WSAuthMiddleware = async (
 			new AuthRepositoryImpl(prisma),
 		).execute(token);
 
-		if (!response) throw new Error("Sessão expirada.");
+		if (!response) throw new SessionExpiredError();
 
-		if (response?.token !== token) throw new Error("Sessão expirada.");
+		if (response?.token !== token) throw new SessionExpiredError();
 
 		return {
 			id: response.id,
@@ -39,6 +40,9 @@ export const WSAuthMiddleware = async (
 			ws_token: socket.id,
 		};
 	} catch (error: any) {
-		socket.emit("error", { error: HandleError(error), redirect: "/login" });
+		socket.emit("error", {
+			error: HandleError(error, req),
+			redirect: "/login",
+		});
 	}
 };

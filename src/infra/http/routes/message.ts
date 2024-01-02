@@ -10,6 +10,7 @@ import { CreateChatUseCase } from "../../../application/use-cases/chat-use-case/
 import { GetChatUseCase } from "../../../application/use-cases/chat-use-case/get-chat-use-case";
 import { ChatRepositoryImpl } from "../../database/repositories/chat-repository-impl";
 import { GetMeessageNotificationsUseCase } from "../../../application/use-cases/message-use-case/get-message-notifications-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -36,19 +37,19 @@ const messageController = new MessageController(
 	getMeessageNotificationsUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	messageController.createMessage(req, res);
 });
 
-routes.put("/:chatId", AuthMiddleware, (req, res) => {
+routes.put("/:chatId", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	messageController.markAsRead(req, res);
 });
 
-routes.get("/:chatId", AuthMiddleware, (req, res) => {
+routes.get("/:chatId", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	messageController.getMessages(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	messageController.getMessageNotifications(req, res);
 });
 

@@ -6,6 +6,7 @@ import { ChatController } from "../controllers/chat-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { GetAllChatsUseCase } from "../../../application/use-cases/chat-use-case/get-all-chats-use-case";
 import { GetUsersChatUseCase } from "../../../application/use-cases/chat-use-case/get-users-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -21,15 +22,15 @@ const chatController = new ChatController(
 	getAllChatsUseCase,
 );
 
-routes.post("/", AuthMiddleware, (req, res) => {
+routes.post("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	chatController.createChat(req, res);
 });
 
-routes.get("/users", AuthMiddleware, (req, res) => {
+routes.get("/users", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	chatController.getUsers(req, res);
 });
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	chatController.getAll(req, res);
 });
 

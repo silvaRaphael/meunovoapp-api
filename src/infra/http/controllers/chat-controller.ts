@@ -5,6 +5,7 @@ import { CreateChatUseCase } from "../../../application/use-cases/chat-use-case/
 import { GetAllChatsUseCase } from "../../../application/use-cases/chat-use-case/get-all-chats-use-case";
 import { GetUsersChatUseCase } from "../../../application/use-cases/chat-use-case/get-users-use-case";
 import { AuthRequest } from "../../config/auth-request";
+import { UserNotFoundError } from "../../../application/errors";
 
 export class ChatController {
 	constructor(
@@ -18,7 +19,7 @@ export class ChatController {
 			const { userId } = req as AuthRequest;
 			const { receiver_id } = createChatSchema.parse(req.body);
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			await this.createChatUseCase.execute({
 				user_id: userId,
@@ -27,7 +28,7 @@ export class ChatController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -35,7 +36,7 @@ export class ChatController {
 		try {
 			const { userId, clientId, userRole } = req as AuthRequest;
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			const response = await this.getUsersChatUseCase.execute({
 				user_id: userId,
@@ -44,7 +45,7 @@ export class ChatController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -52,13 +53,13 @@ export class ChatController {
 		try {
 			const { userId } = req as AuthRequest;
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			const response = await this.getAllChatsUseCase.execute(userId);
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

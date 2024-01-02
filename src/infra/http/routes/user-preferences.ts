@@ -5,6 +5,7 @@ import { UserPreferencesRepositoryImpl } from "../../database/repositories/user-
 import { UpdateUserPreferencesUseCase } from "../../../application/use-cases/user-preferences-use-case/update-user-preferences-use-case";
 import { UserPrefenrecesController } from "../controllers/user-preferences-controller";
 import { GetUserPreferencesUseCase } from "../../../application/use-cases/user-preferences-use-case/get-user-preferences-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -22,11 +23,11 @@ const userPreferencesController = new UserPrefenrecesController(
 	getUserPreferencesUseCase,
 );
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	userPreferencesController.getUserPreferences(req, res);
 });
 
-routes.put("/", AuthMiddleware, (req, res) => {
+routes.put("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	userPreferencesController.updateUserPreferences(req, res);
 });
 

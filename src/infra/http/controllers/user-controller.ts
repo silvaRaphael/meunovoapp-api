@@ -30,6 +30,12 @@ import {
 } from "../../templates/reset-password-template";
 import { genPasswordKey } from "../utils/gen-password-key";
 import { GetUserByPasswordKeyUseCase } from "../../../application/use-cases/user-use-case/get-user-by-password-key-use-case";
+import { UserNotFoundError } from "../../../application/errors";
+import { EmailAlreadyInUseError } from "../../../application/errors/email-alread-in-use";
+import { EmailNotAvailableError } from "../../../application/errors/email-not-available";
+import { InvalidResetPasswordKeyError } from "../../../application/errors/reset-password-key-invalid";
+import { CompleteProfileError } from "../../../application/errors/complete-profile";
+import { getLang, handleLanguage } from "../utils/handle-language";
 
 export class UserController {
 	constructor(
@@ -75,7 +81,7 @@ export class UserController {
 
 			res.status(200).send(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -85,19 +91,13 @@ export class UserController {
 
 			const user = await this.getUserByEmailUseCase.execute(email);
 
-			if (!user) throw new Error("Usuário não encontrado.");
+			if (!user) throw new UserNotFoundError(req);
 
-			if (!user.password)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!user.password) throw new CompleteProfileError(req);
 
 			const passwordResetKey = genPasswordKey(user.password);
 
-			if (!passwordResetKey)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!passwordResetKey) throw new CompleteProfileError(req);
 
 			await this.sendEmailUseCase.execute({
 				from: process.env.EMAIL_SENDER || "",
@@ -118,7 +118,7 @@ export class UserController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -143,7 +143,7 @@ export class UserController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -157,7 +157,7 @@ export class UserController {
 			const userEmail = await this.getUserByEmailUseCase.execute(email);
 
 			if (userEmail && userEmail.id !== id)
-				throw new Error("E-mail já em uso.");
+				throw new EmailAlreadyInUseError(req);
 
 			let avatarPath;
 
@@ -190,7 +190,7 @@ export class UserController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -205,14 +205,21 @@ export class UserController {
 
 			const user = await this.getUserByEmailUseCase.execute(email);
 
-			if (user && user.id !== id)
-				throw new Error("E-mail não disponível.");
+			if (user && user.id !== id) throw new EmailNotAvailableError(req);
 
 			if (old_password) {
 				const user = await this.getUserUseCase.execute(id);
 
 				if (!compareSync(old_password, user?.password || ""))
-					throw new Error("Senha antiga incorreta.");
+					throw new Error(
+						handleLanguage(
+							[
+								["en", "Wrong old password."],
+								["pt", "Senha antiga incorreta."],
+							],
+							getLang(req),
+						),
+					);
 			}
 
 			let avatarPath;
@@ -241,7 +248,7 @@ export class UserController {
 
 			res.status(200).json({ avatar: avatarPath });
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -252,22 +259,16 @@ export class UserController {
 
 			const user = await this.getUserByPasswordKeyUseCase.execute(key);
 
-			if (!user) throw new Error("Chave de recuperação inválida.");
+			if (!user) throw new InvalidResetPasswordKeyError(req);
 
-			if (!user.password)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!user.password) throw new CompleteProfileError(req);
 
 			const passwordResetKey = genPasswordKey(user.password);
 
-			if (!passwordResetKey)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!passwordResetKey) throw new CompleteProfileError(req);
 
 			if (passwordResetKey !== key)
-				throw new Error("Chave de recuperação inválida.");
+				throw new InvalidResetPasswordKeyError(req);
 
 			await this.updateUserUseCase.execute({
 				id: user.id,
@@ -278,7 +279,7 @@ export class UserController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -288,7 +289,7 @@ export class UserController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -302,7 +303,7 @@ export class UserController {
 
 			res.status(200).json(user);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -318,7 +319,7 @@ export class UserController {
 
 			res.status(200).json(user);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -328,26 +329,20 @@ export class UserController {
 
 			const user = await this.getUserByPasswordKeyUseCase.execute(key);
 
-			if (!user) throw new Error("Chave de recuperação inválida.");
+			if (!user) throw new InvalidResetPasswordKeyError(req);
 
-			if (!user.password)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!user.password) throw new CompleteProfileError(req);
 
 			const passwordResetKey = genPasswordKey(user.password);
 
-			if (!passwordResetKey)
-				throw new Error(
-					"Usuário inativo. Complete seu perfil primeiro.",
-				);
+			if (!passwordResetKey) throw new CompleteProfileError(req);
 
 			if (passwordResetKey !== key)
-				throw new Error("Chave de recuperação inválida.");
+				throw new InvalidResetPasswordKeyError(req);
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -357,15 +352,24 @@ export class UserController {
 
 			const user = await this.getUserUseCase.execute(id);
 
-			if (!user) throw new Error("Usuário não existe.");
+			if (!user) throw new UserNotFoundError(req);
 
-			if (user?.password) throw new Error("Usuário já cadastrado.");
+			if (user?.password)
+				throw new Error(
+					handleLanguage(
+						[
+							["en", "Already registered user."],
+							["pt", "Usuário já cadastrado."],
+						],
+						getLang(req),
+					),
+				);
 
 			res.status(200).json({
 				email: user.email,
 			});
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -376,11 +380,11 @@ export class UserController {
 
 			const user = await this.getUserByEmailUseCase.execute(email);
 
-			if (user && user.id !== id) throw new Error("E-mail já em uso.");
+			if (user && user.id !== id) throw new EmailAlreadyInUseError(req);
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

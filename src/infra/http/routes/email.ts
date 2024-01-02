@@ -9,6 +9,7 @@ import { GetEmailUseCase } from "../../../application/use-cases/email-use-case/g
 import { EmailController } from "../controllers/email-controller";
 import { ReplyEmailUseCase } from "../../../application/use-cases/email-use-case/reply-email-use-case";
 import { RoleMiddleware } from "../middlewares/role-middleware";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -34,12 +35,19 @@ routes.post("/budget-message", (req, res) => {
 	emailController.sendBudgetMessageEmail(req, res);
 });
 
-routes.post("/user-invite", AuthMiddleware, RoleMiddleware, (req, res) => {
-	emailController.sendUserInviteMessageEmail(req, res);
-});
+routes.post(
+	"/user-invite",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		emailController.sendUserInviteMessageEmail(req, res);
+	},
+);
 
 routes.post(
 	"/reply-contact-message",
+	LanguageMiddleware,
 	AuthMiddleware,
 	RoleMiddleware,
 	(req, res) => {
@@ -49,6 +57,7 @@ routes.post(
 
 routes.post(
 	"/reply-budget-message",
+	LanguageMiddleware,
 	AuthMiddleware,
 	RoleMiddleware,
 	(req, res) => {
@@ -60,12 +69,24 @@ routes.post("/", (req, res) => {
 	emailController.sendEmail(req, res);
 });
 
-routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	emailController.getAllEmails(req, res);
-});
+routes.get(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		emailController.getAllEmails(req, res);
+	},
+);
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	emailController.getEmail(req, res);
-});
+routes.get(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		emailController.getEmail(req, res);
+	},
+);
 
 export default routes;

@@ -6,6 +6,7 @@ import { prisma } from "../../database/prisma";
 import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
 import { SignOutUseCase } from "../../../application/use-cases/auth-use-case/sign-out-use-case";
 import { AuthController } from "../controllers/auth-controller";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -17,11 +18,11 @@ const signOutUseCase = new SignOutUseCase(authRepository);
 
 const authController = new AuthController(signInUseCase, signOutUseCase);
 
-routes.post("/sign-in", (req, res) => {
+routes.post("/sign-in", LanguageMiddleware, (req, res) => {
 	authController.signIn(req, res);
 });
 
-routes.get("/sign-out", AuthMiddleware, (req, res) => {
+routes.get("/sign-out", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	authController.signOut(req, res);
 });
 

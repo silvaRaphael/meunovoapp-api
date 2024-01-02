@@ -1,17 +1,33 @@
+import { Request } from "express";
 import { ZodError } from "zod";
+import { getLang, handleLanguage } from "./handle-language";
 
-export const HandleError = (error: any) => {
+export const HandleError = (error: any, req?: Request) => {
 	const zodError = error instanceof ZodError;
 
-	if (!zodError)
-		return [
-			{
-				message: error.message,
-				path: error.path,
-			},
-		];
+	const title = handleLanguage(
+		[
+			["en", "An error occurred!"],
+			["pt", "Ocorreu algum erro!"],
+		],
+		getLang(req),
+	);
 
-	return error.errors.map(({ message }) => ({
-		message,
-	}));
+	if (!zodError)
+		return {
+			title,
+			errors: [
+				{
+					message: error.message,
+					path: error.path,
+				},
+			],
+		};
+
+	return {
+		title,
+		errors: error.errors.map(({ message }) => ({
+			message,
+		})),
+	};
 };

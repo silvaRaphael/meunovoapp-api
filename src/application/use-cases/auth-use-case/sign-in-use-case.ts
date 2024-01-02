@@ -4,6 +4,7 @@ import { AuthRepository } from "../../repositories/auth-repository";
 import { UserRepository } from "../../repositories/user-repository";
 import { SignInSchema } from "../../adapters/auth";
 import { User } from "../../../domain/user";
+import { UserNotFoundError } from "../../errors";
 
 export class SignInUseCase {
 	constructor(
@@ -15,8 +16,8 @@ export class SignInUseCase {
 		try {
 			const response = await this.userRepository.getOneByEmail(email);
 
-			if (!response) throw new Error("E-mail não encontrado.");
-			if (!response.password) throw new Error("Conta não ativada.");
+			if (!response) throw new UserNotFoundError();
+			if (!response.password) throw new Error("Conta não ativa.");
 
 			if (
 				!compareSync(password, response.password) &&

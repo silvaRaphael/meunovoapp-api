@@ -12,6 +12,7 @@ import { GetChatUseCase } from "../../../application/use-cases/chat-use-case/get
 import { HandleError } from "../../http/utils/handle-error";
 import { Socket } from "socket.io";
 import { MessageUser } from "../../../domain/message";
+import { UserNotFoundError } from "../../../application/errors";
 
 export class WSMessageController {
 	constructor(
@@ -35,7 +36,7 @@ export class WSMessageController {
 			const chatExistent = await this.getChatUseCase.execute(chat_id);
 
 			if (!chatExistent) {
-				if (!receiver_id) throw new Error("Usuário não encontrado.");
+				if (!receiver_id) throw new UserNotFoundError();
 
 				await this.createChatUseCase.execute({
 					id: chat_id,

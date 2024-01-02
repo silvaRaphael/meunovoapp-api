@@ -10,6 +10,7 @@ import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { RoleMiddleware } from "../middlewares/role-middleware";
 import { ManagerMiddleware } from "../middlewares/manager-middleware";
 import { UploadFileUseCase } from "../../../application/use-cases/file-use-case/upload-file-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -29,20 +30,44 @@ const clientController = new ClientController(
 	uploadFileUseCase,
 );
 
-routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	clientController.createClient(req, res);
-});
+routes.post(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		clientController.createClient(req, res);
+	},
+);
 
-routes.put("/:id", AuthMiddleware, ManagerMiddleware, (req, res) => {
-	clientController.updateClient(req, res);
-});
+routes.put(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	ManagerMiddleware,
+	(req, res) => {
+		clientController.updateClient(req, res);
+	},
+);
 
-routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	clientController.getAllClients(req, res);
-});
+routes.get(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		clientController.getAllClients(req, res);
+	},
+);
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	clientController.getClient(req, res);
-});
+routes.get(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		clientController.getClient(req, res);
+	},
+);
 
 export default routes;

@@ -11,6 +11,7 @@ import { CreateMessageUseCase } from "../../../application/use-cases/message-use
 import { CreateChatUseCase } from "../../../application/use-cases/chat-use-case/create-chat-use-case";
 import { GetChatUseCase } from "../../../application/use-cases/chat-use-case/get-chat-use-case";
 import { GetMeessageNotificationsUseCase } from "../../../application/use-cases/message-use-case/get-message-notifications-use-case";
+import { UserNotFoundError } from "../../../application/errors";
 
 export class MessageController {
 	constructor(
@@ -28,12 +29,12 @@ export class MessageController {
 			const { chat_id, text, labels, receiver_id } =
 				createMessageSchema.parse(req.body);
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			const chatExistent = await this.getChatUseCase.execute(chat_id);
 
 			if (!chatExistent) {
-				if (!receiver_id) throw new Error("Usuário não encontrado.");
+				if (!receiver_id) throw new UserNotFoundError(req);
 
 				await this.createChatUseCase.execute({
 					id: chat_id,
@@ -51,7 +52,7 @@ export class MessageController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -62,7 +63,7 @@ export class MessageController {
 				chat_id: req.params.chatId,
 			});
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			await this.markAsReadMessageUseCase.execute({
 				user_id: userId,
@@ -71,7 +72,7 @@ export class MessageController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -80,13 +81,13 @@ export class MessageController {
 			const { userId } = req as AuthRequest;
 			const { chatId } = req.params;
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			const response = await this.getAllMessagesUseCase.execute(chatId);
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -94,7 +95,7 @@ export class MessageController {
 		try {
 			const { userId } = req as AuthRequest;
 
-			if (!userId) throw new Error("Usuário não encontrado.");
+			if (!userId) throw new UserNotFoundError(req);
 
 			const response = await this.getMeessageNotificationsUseCase.execute(
 				userId,
@@ -102,7 +103,7 @@ export class MessageController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

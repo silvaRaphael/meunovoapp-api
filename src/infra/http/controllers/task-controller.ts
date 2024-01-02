@@ -16,6 +16,7 @@ import {
 	notificationMessageTemplate,
 } from "../../templates/notification-message-template";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
+import { getLang, handleLanguage } from "../utils/handle-language";
 
 export class TaskController {
 	constructor(
@@ -53,7 +54,7 @@ export class TaskController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -114,7 +115,7 @@ export class TaskController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -128,8 +129,7 @@ export class TaskController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			console.error(error);
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -141,7 +141,7 @@ export class TaskController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -151,14 +151,31 @@ export class TaskController {
 
 			const response = await this.getTaskUseCase.execute(id);
 
-			if (!response) throw new Error("Tarefa não existe.");
+			if (!response)
+				throw new Error(
+					handleLanguage(
+						[
+							["en", "Task not found."],
+							["pt", "Tarefa não encontrada."],
+						],
+						getLang(req),
+					),
+				);
 
 			if (["cancelled", "completed"].includes(response.status))
-				throw new Error("Tarefa já finalizada.");
+				throw new Error(
+					handleLanguage(
+						[
+							["en", "Task already finished."],
+							["pt", "Tarefa já finalizada."],
+						],
+						getLang(req),
+					),
+				);
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

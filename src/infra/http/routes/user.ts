@@ -19,6 +19,7 @@ import { CreateNotificationUseCase } from "../../../application/use-cases/notifi
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 import { DeleteFileUseCase } from "../../../application/use-cases/file-use-case/delete-file-use-case";
 import { GetUserByPasswordKeyUseCase } from "../../../application/use-cases/user-use-case/get-user-by-password-key-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -59,55 +60,84 @@ const userController = new UserController(
 	sendEmailUseCase,
 );
 
-routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	userController.createUser(req, res);
-});
+routes.post(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		userController.createUser(req, res);
+	},
+);
 
-routes.post("/reset-password", (req, res) => {
+routes.post("/reset-password", LanguageMiddleware, (req, res) => {
 	userController.resetPassword(req, res);
 });
 
-routes.put("/reset-password/:key", (req, res) => {
+routes.put("/reset-password/:key", LanguageMiddleware, (req, res) => {
 	userController.updatePassword(req, res);
 });
 
-routes.get("/can-reset-password/:key", (req, res) => {
+routes.get("/can-reset-password/:key", LanguageMiddleware, (req, res) => {
 	userController.canResetPassword(req, res);
 });
 
-routes.post("/invite/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	userController.inviteUser(req, res);
-});
+routes.post(
+	"/invite/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		userController.inviteUser(req, res);
+	},
+);
 
-routes.put("/complete/:id", (req, res) => {
+routes.put("/complete/:id", LanguageMiddleware, (req, res) => {
 	userController.completeUser(req, res);
 });
 
-routes.put("/:id?", AuthMiddleware, (req, res) => {
+routes.put("/:id?", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	userController.updateUser(req, res);
 });
 
-routes.get("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	userController.getAllUsers(req, res);
-});
+routes.get(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		userController.getAllUsers(req, res);
+	},
+);
 
-routes.get("/profile", AuthMiddleware, (req, res) => {
+routes.get("/profile", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	userController.getProfile(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	userController.getUser(req, res);
-});
+routes.get(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		userController.getUser(req, res);
+	},
+);
 
-routes.get("/can-update/:id", (req, res) => {
+routes.get("/can-update/:id", LanguageMiddleware, (req, res) => {
 	userController.canUpdate(req, res);
 });
 
-routes.post("/can-use-email", AuthMiddleware, (req, res) => {
-	userController.canUseEmail(req, res);
-});
+routes.post(
+	"/can-use-email",
+	LanguageMiddleware,
+	AuthMiddleware,
+	(req, res) => {
+		userController.canUseEmail(req, res);
+	},
+);
 
-routes.post("/can-use-email/:id", (req, res) => {
+routes.post("/can-use-email/:id", LanguageMiddleware, (req, res) => {
 	userController.canUseEmail(req, res);
 });
 

@@ -19,7 +19,7 @@ export class FileController {
 				fileName: response.fileName,
 			});
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 

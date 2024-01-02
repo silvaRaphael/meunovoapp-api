@@ -13,6 +13,7 @@ import { NotificationRepositoryImpl } from "../../database/repositories/notifica
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
 import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
 import { mailSender } from "../../providers/nodemailer";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -40,24 +41,42 @@ const projectController = new ProjectController(
 	sendEmailUseCase,
 );
 
-routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	projectController.createProject(req, res);
-});
+routes.post(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		projectController.createProject(req, res);
+	},
+);
 
-routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	projectController.updateProject(req, res);
-});
+routes.put(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		projectController.updateProject(req, res);
+	},
+);
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	projectController.getAllProjects(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	projectController.getProject(req, res);
 });
 
-routes.get("/can-update/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	projectController.canUpdate(req, res);
-});
+routes.get(
+	"/can-update/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		projectController.canUpdate(req, res);
+	},
+);
 
 export default routes;

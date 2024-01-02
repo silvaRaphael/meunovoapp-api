@@ -16,6 +16,7 @@ import {
 	NotificationMessageTemplate,
 	notificationMessageTemplate,
 } from "../../templates/notification-message-template";
+import { getLang, handleLanguage } from "../utils/handle-language";
 
 export class ProjectController {
 	constructor(
@@ -72,7 +73,7 @@ export class ProjectController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -132,7 +133,7 @@ export class ProjectController {
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -147,7 +148,7 @@ export class ProjectController {
 			res.status(200).json(response);
 		} catch (error: any) {
 			console.error(error);
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -159,7 +160,7 @@ export class ProjectController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 
@@ -169,14 +170,31 @@ export class ProjectController {
 
 			const response = await this.getProjectUseCase.execute(id);
 
-			if (!response) throw new Error("Projeto não existe.");
+			if (!response)
+				throw new Error(
+					handleLanguage(
+						[
+							["en", "Project doesn't exist."],
+							["pt", "Projeto não existe."],
+						],
+						getLang(req),
+					),
+				);
 
 			if (["cancelled", "completed"].includes(response.status))
-				throw new Error("Projeto já finalizado.");
+				throw new Error(
+					handleLanguage(
+						[
+							["en", "Project already finished."],
+							["pt", "Projeto já finalizado."],
+						],
+						getLang(req),
+					),
+				);
 
 			res.status(200).send();
 		} catch (error: any) {
-			res.status(401).send({ error: HandleError(error) });
+			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}
 }

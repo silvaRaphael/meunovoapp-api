@@ -16,6 +16,9 @@ export const RoleMiddleware = async (
 
 		next();
 	} catch (error: any) {
-		res.status(401).send({ error: HandleError(error), redirect: "/login" });
+		res.status(401).send({
+			error: HandleError(error, req),
+			redirect: "/login",
+		});
 	}
 };

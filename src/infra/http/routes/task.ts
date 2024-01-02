@@ -13,6 +13,7 @@ import { CreateNotificationUseCase } from "../../../application/use-cases/notifi
 import { EmailRepositoryImpl } from "../../database/repositories/email-repository-impl";
 import { mailSender } from "../../providers/nodemailer";
 import { SendEmailUseCase } from "../../../application/use-cases/email-use-case/send-email-use-case";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -40,24 +41,42 @@ const taskController = new TaskController(
 	sendEmailUseCase,
 );
 
-routes.post("/", AuthMiddleware, RoleMiddleware, (req, res) => {
-	taskController.createTask(req, res);
-});
+routes.post(
+	"/",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		taskController.createTask(req, res);
+	},
+);
 
-routes.put("/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	taskController.updateTask(req, res);
-});
+routes.put(
+	"/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		taskController.updateTask(req, res);
+	},
+);
 
-routes.get("/", AuthMiddleware, (req, res) => {
+routes.get("/", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	taskController.getAllTasks(req, res);
 });
 
-routes.get("/:id", AuthMiddleware, (req, res) => {
+routes.get("/:id", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	taskController.getTask(req, res);
 });
 
-routes.get("/can-update/:id", AuthMiddleware, RoleMiddleware, (req, res) => {
-	taskController.canUpdate(req, res);
-});
+routes.get(
+	"/can-update/:id",
+	LanguageMiddleware,
+	AuthMiddleware,
+	RoleMiddleware,
+	(req, res) => {
+		taskController.canUpdate(req, res);
+	},
+);
 
 export default routes;

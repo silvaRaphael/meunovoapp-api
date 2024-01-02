@@ -6,6 +6,7 @@ import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { DashboardController } from "../controllers/dashboard-controller";
 import { GetAllUsersUseCase } from "../../../application/use-cases/user-use-case/get-all-users-use-case";
 import { UserRepositoryImpl } from "../../database/repositories/user-repository-impl";
+import { LanguageMiddleware } from "../middlewares/language-middleware";
 
 const routes = Router();
 
@@ -20,11 +21,11 @@ const dashboardController = new DashboardController(
 	getAllUsersUseCase,
 );
 
-routes.get("/projects", AuthMiddleware, (req, res) => {
+routes.get("/projects", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	dashboardController.getProjects(req, res);
 });
 
-routes.get("/users", AuthMiddleware, (req, res) => {
+routes.get("/users", LanguageMiddleware, AuthMiddleware, (req, res) => {
 	dashboardController.getUsers(req, res);
 });
 
