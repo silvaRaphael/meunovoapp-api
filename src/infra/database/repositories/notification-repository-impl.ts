@@ -17,14 +17,15 @@ export class NotificationRepositoryImpl implements NotificationRepository {
 		}
 	}
 
-	async markAsRead(notificationId: string): Promise<void> {
+	async markAsRead(userId: string): Promise<void> {
 		try {
-			await this.database.notification.update({
+			await this.database.notification.updateMany({
 				data: {
 					read: true,
 				},
 				where: {
-					id: notificationId,
+					user_id: userId,
+					read: false,
 				},
 			});
 		} catch (error: any) {

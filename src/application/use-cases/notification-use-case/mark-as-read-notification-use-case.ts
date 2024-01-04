@@ -3,9 +3,9 @@ import { NotificationRepository } from "../../repositories/notification-reposito
 export class MarkAsReadNotificationUseCase {
 	constructor(private notificationRepository: NotificationRepository) {}
 
-	async execute(notificationId: string): Promise<void> {
+	async execute(userId: string): Promise<void> {
 		try {
-			await this.notificationRepository.markAsRead(notificationId);
+			await this.notificationRepository.markAsRead(userId);
 		} catch (error) {
 			throw error;
 		}

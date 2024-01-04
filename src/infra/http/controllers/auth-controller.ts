@@ -4,6 +4,7 @@ import { SignOutUseCase } from "../../../application/use-cases/auth-use-case/sig
 import { AuthRequest } from "../../config/auth-request";
 import { SignInUseCase } from "../../../application/use-cases/auth-use-case/sign-in-use-case";
 import { signInSchema, tokenSchema } from "../../../application/adapters/auth";
+import { addHours } from "date-fns";
 
 export class AuthController {
 	constructor(
@@ -22,7 +23,7 @@ export class AuthController {
 
 			res.cookie("auth", response.token, {
 				httpOnly: true,
-				maxAge: 90 * 60000,
+				expires: addHours(new Date(), 12),
 				path: "/",
 			})
 				.status(200)

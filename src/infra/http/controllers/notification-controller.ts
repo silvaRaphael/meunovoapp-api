@@ -3,10 +3,12 @@ import { HandleError } from "../utils/handle-error";
 import { GetAllNotificationsUseCase } from "../../../application/use-cases/notification-use-case/get-all-notifications-use-case";
 import { userIdSchema } from "../../../application/adapters/user";
 import { AuthRequest } from "../../config/auth-request";
+import { MarkAsReadNotificationUseCase } from "../../../application/use-cases/notification-use-case/mark-as-read-notification-use-case";
 
 export class NotificationController {
 	constructor(
 		private getAllNotificationsUseCase: GetAllNotificationsUseCase,
+		private markAsReadNotificationUseCase: MarkAsReadNotificationUseCase,
 	) {}
 
 	async getAllNotifications(req: Request, res: Response) {
@@ -18,6 +20,18 @@ export class NotificationController {
 			);
 
 			res.status(200).json(response);
+		} catch (error: any) {
+			res.status(401).send({ error: HandleError(error, req) });
+		}
+	}
+
+	async markAsReadNotification(req: Request, res: Response) {
+		try {
+			const { userId } = userIdSchema.parse(req as AuthRequest);
+
+			await this.markAsReadNotificationUseCase.execute(userId);
+
+			res.status(200).send();
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error, req) });
 		}
