@@ -10,5 +10,6 @@ export const handleLanguage = (texts: [Langs, string][], lang?: Langs) => {
 };
 
 export const getLang = (req?: Request) => {
+	if (!req) return languages[0].lang;
 	return (req as LanguageRequest).language?.lang ?? languages[0].lang;
 };
