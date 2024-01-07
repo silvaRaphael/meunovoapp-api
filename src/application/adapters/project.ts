@@ -22,6 +22,7 @@ export const createProjectSchema = z.object({
 	budget: z
 		.number({
 			required_error: "Orçamento é necessário.",
+			coerce: true,
 		})
 		.optional(),
 	status: z

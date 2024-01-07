@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { languages } from "../../config/languages";
+import { LanguageRequest, languages } from "../../config/languages";
 
 export const LanguageMiddleware = async (
 	req: Request,
@@ -8,7 +8,7 @@ export const LanguageMiddleware = async (
 ) => {
 	const contentLanguage = req.headers["content-language"];
 
-	(req as any).language =
+	(req as LanguageRequest).language =
 		languages.find((item) => item.locale === contentLanguage) ??
 		languages[0];
 

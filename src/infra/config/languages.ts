@@ -25,5 +25,5 @@ export const languages: Language[] = [
 ];
 
 export interface LanguageRequest extends Request {
-	language: Language;
+	language?: Language;
 }

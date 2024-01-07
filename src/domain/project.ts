@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import { Status } from "../application/adapters/status";
-import { Task } from "./task";
 
 export interface IProject {
 	id?: string;
