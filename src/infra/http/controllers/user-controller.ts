@@ -36,6 +36,7 @@ import { EmailNotAvailableError } from "../../../application/errors/email-not-av
 import { InvalidResetPasswordKeyError } from "../../../application/errors/reset-password-key-invalid";
 import { CompleteProfileError } from "../../../application/errors/complete-profile";
 import { getLang, handleLanguage } from "../utils/handle-language";
+import { addHours } from "date-fns";
 
 export class UserController {
 	constructor(
@@ -180,15 +181,28 @@ export class UserController {
 				password,
 			});
 
-			this.createNotificationUseCase.execute({
-				user_id: "6e161850-e0bf-4a13-8417-212dd796be2a",
-				title: "Novo usuário",
-				description: `Usuário "${name}" completou seu cadastro!`,
-				type: "done",
-				link: `/usuarios/${id}`,
+			(req as AuthRequest).masterUserId?.forEach((user_id) => {
+				this.createNotificationUseCase.execute({
+					user_id,
+					title: "Novo usuário",
+					description: `Usuário "${name}" completou o cadastro!`,
+					type: "done",
+					link: `/usuarios/${id}`,
+				});
 			});
 
-			res.status(200).json(response);
+			res.cookie("auth", response.token, {
+				httpOnly: true,
+				expires: addHours(new Date(), 12),
+				path: "/",
+			})
+				.status(200)
+				.json({
+					name: response.name,
+					email: response.email,
+					role: response.role,
+					avatar: response.avatar,
+				});
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error, req) });
 		}

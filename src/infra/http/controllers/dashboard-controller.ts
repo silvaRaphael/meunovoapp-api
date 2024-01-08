@@ -34,9 +34,9 @@ export class DashboardController {
 				return {
 					name: item.name,
 					progress:
-						item.status === "completed"
+						(item.status === "completed"
 							? 100
-							: (doneTasks / totalTasks) * 100,
+							: (doneTasks / totalTasks) * 100) || 1,
 				};
 			});
 

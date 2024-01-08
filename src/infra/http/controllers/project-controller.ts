@@ -147,7 +147,6 @@ export class ProjectController {
 
 			res.status(200).json(response);
 		} catch (error: any) {
-			console.error(error);
 			res.status(401).send({ error: HandleError(error, req) });
 		}
 	}

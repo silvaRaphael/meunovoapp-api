@@ -114,7 +114,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 					id: true,
 					name: true,
 					status: true,
-					due: true,
+					budget: true,
 					client: {
 						select: {
 							id: true,

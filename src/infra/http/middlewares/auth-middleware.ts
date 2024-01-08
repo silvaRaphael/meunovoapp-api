@@ -33,6 +33,9 @@ export const AuthMiddleware = async (
 		(req as AuthRequest).userIsManager = response.is_manager;
 		(req as AuthRequest).clientId = response.client_id || undefined;
 		(req as AuthRequest).userId = response.id;
+		(req as AuthRequest).masterUserId = [
+			"6e161850-e0bf-4a13-8417-212dd796be2a",
+		];
 
 		next();
 	} catch (error: any) {

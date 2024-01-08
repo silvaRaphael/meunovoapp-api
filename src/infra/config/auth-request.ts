@@ -8,4 +8,5 @@ export interface AuthRequest extends Request {
 	userIsManager?: boolean;
 	clientId?: string;
 	token?: string;
+	masterUserId?: string[];
 }
