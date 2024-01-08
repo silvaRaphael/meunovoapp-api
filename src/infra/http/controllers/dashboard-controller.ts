@@ -4,6 +4,7 @@ import { GetAllProjectsUseCase } from "../../../application/use-cases/project-us
 import { AuthRequest } from "../../config/auth-request";
 import { GetAllUsersUseCase } from "../../../application/use-cases/user-use-case/get-all-users-use-case";
 import { Task } from "../../../domain/task";
+import { ProjectFilter } from "../../../application/repositories/project-repository";
 
 export class DashboardController {
 	constructor(
@@ -15,7 +16,7 @@ export class DashboardController {
 		try {
 			const { clientId, userRole } = req as AuthRequest;
 
-			const filter = {};
+			const filter: ProjectFilter = {};
 
 			if (userRole != "master") (filter as any).client_id = clientId;
 
@@ -37,6 +38,7 @@ export class DashboardController {
 						(item.status === "completed"
 							? 100
 							: (doneTasks / totalTasks) * 100) || 1,
+					due: item.due,
 				};
 			});
 
