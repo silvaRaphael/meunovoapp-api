@@ -33,6 +33,7 @@ export class DashboardController {
 					).length || 0;
 
 				return {
+					id: item.id,
 					name: item.name,
 					progress:
 						(item.status === "completed"
