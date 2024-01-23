@@ -11,6 +11,7 @@ import project from "./project";
 import task from "./task";
 import chat from "./chat";
 import message from "./message";
+import note from "./note";
 
 const routes = Router();
 
@@ -25,6 +26,7 @@ routes.use("/projects", project);
 routes.use("/tasks", task);
 routes.use("/chats", chat);
 routes.use("/messages", message);
+routes.use("/notes", note);
 
 routes.get("/", (_, res) => res.end());
 

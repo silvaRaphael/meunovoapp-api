@@ -28,6 +28,7 @@ model User {
   notifications Notification[]
   userPreferences UserPreferences?
   messages Message[]
+  notes Note[]
 }
 
 model Email {
@@ -121,5 +122,16 @@ model Message {
 	labels String[]
 
   chat Chat @relation(fields: [chat_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Note {
+  id String @id @unique
+  user_id String
+  title String
+  content String?
+  markers String[]
+  created_at DateTime
+
   user User @relation(fields: [user_id], references: [id])
 }
