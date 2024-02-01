@@ -25,5 +25,6 @@ app.use("/v1", routes);
 app.use("/files", files);
 
 app.get("/", (_, res) => res.end());
+app.get("*", (_, res) => res.status(404).end());
 
 export { server };

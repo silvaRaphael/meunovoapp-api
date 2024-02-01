@@ -29,5 +29,6 @@ routes.use("/messages", message);
 routes.use("/notes", note);
 
 routes.get("/", (_, res) => res.end());
+routes.get("*", (_, res) => res.status(404).end());
 
 export { routes };

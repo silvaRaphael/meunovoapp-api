@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { HandleError } from "../utils/handle-error";
 import { CreateNoteUseCase } from "../../../application/use-cases/note-use-case/create-note-use-case";
 import { UpdateNoteUseCase } from "../../../application/use-cases/note-use-case/update-note-use-case";
@@ -31,14 +31,14 @@ export class NoteController {
 				},
 			);
 
-			await this.createNoteUseCase.execute({
+			const response = await this.createNoteUseCase.execute({
 				user_id,
 				title,
 				content,
 				markers,
 			});
 
-			res.status(200).send();
+			res.status(200).json(response);
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error, req) });
 		}
