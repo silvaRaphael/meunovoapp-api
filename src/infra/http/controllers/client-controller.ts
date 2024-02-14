@@ -23,11 +23,11 @@ export class ClientController {
 		try {
 			const { company } = createClientSchema.parse(req.body);
 
-			await this.createClientUseCase.execute({
+			const { id } = await this.createClientUseCase.execute({
 				company,
 			});
 
-			res.status(200).send();
+			return res.status(200).json({ id });
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error, req) });
 		}
