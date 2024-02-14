@@ -60,7 +60,7 @@ export class UserController {
 				req.body,
 			);
 
-			const response = await this.createUserUseCase.execute({
+			const { id } = await this.createUserUseCase.execute({
 				email,
 				client_id,
 				is_manager,
@@ -73,14 +73,14 @@ export class UserController {
 				html: replaceKeys<InviteUserMessageTemplate>(
 					inviteUserMessageTemplate,
 					{
-						"[userId]": response.id,
+						"[userId]": id,
 					},
 				),
 				type: "user-invite",
 				no_save: true,
 			});
 
-			res.status(200).send(response);
+			res.status(200).send({ id });
 		} catch (error: any) {
 			res.status(401).send({ error: HandleError(error, req) });
 		}
