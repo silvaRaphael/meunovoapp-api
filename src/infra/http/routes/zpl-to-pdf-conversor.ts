@@ -1,11 +1,10 @@
-import express, { Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import multer from "multer";
 import axios from "axios";
 import path from "path";
 import AdmZip from "adm-zip";
 
 const zplToPdfConversor = Router();
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -29,30 +28,47 @@ async function uploadFile(req: Request, res: Response) {
 		const zipEntries = zip.getEntries();
 		const pdfZip = new AdmZip();
 
+		let labelsStore = [];
+
+		const zplLabels: any[] = [];
 		for (const entry of zipEntries) {
 			if (
 				entry.entryName.endsWith(".zpl") ||
 				entry.entryName.endsWith(".txt")
 			) {
 				const content = entry.getData().toString("utf8");
-				const zplChunks = splitZplContent(content, 150000); // 150 KB limite por chunk
+				const labels = content
+					.split(/(?=~DGR:)/)
+					// .split("^XZ")
+					.filter(
+						(label) => label.trim() !== "" && label.trim() !== '"',
+					)
+					.map((label) => `${label.replace("\n", "")}^XZ`);
+				// .filter(
+				// 	(label) => label.trim() !== "^XA^IDR:DEMO.GRF^FS^XZ",
+				// );
 
-				for (const chunk of zplChunks) {
-					try {
-						const pdfBuffer = await convertZplToPdf(chunk);
-						pdfZip.addFile(
-							`${entry.entryName
-								.replace(".zpl", ".pdf")
-								.replace(".txt", ".pdf")}`,
-							pdfBuffer,
-						);
-					} catch (err: any) {
-						console.error(
-							`Failed to convert chunk of ${entry.entryName}: ${err.message}`,
-						);
-					}
-				}
+				labels.forEach((label, index) => {
+					const labelName = `${entry.entryName.replace(
+						/(\.zpl|\.txt)$/,
+						"",
+					)}_part${index + 1}.pdf`;
+					zplLabels.push({ index, labelName, label });
+				});
+
+				labelsStore.push({ labels });
 			}
+		}
+
+		// return res.status(400).json({
+		// 	labelsStore,
+		// });
+
+		// Processa cada etiqueta ZPL isoladamente, respeitando o limite de taxa
+		const pdfBuffers = await processLabelsWithRateLimit(zplLabels, 1, 200);
+
+		for (const { labelName, pdfBuffer } of pdfBuffers) {
+			pdfZip.addFile(labelName, pdfBuffer);
 		}
 
 		const pdfZipBuffer = pdfZip.toBuffer();
@@ -65,42 +81,68 @@ async function uploadFile(req: Request, res: Response) {
 	}
 }
 
-// Função para dividir o conteúdo ZPL em partes de até 150 KB
-function splitZplContent(content: string, maxSize: number): string[] {
-	const labels = content.split(/(?=\^XA)/); // Separar sempre que encontrar o início de uma nova etiqueta
-	const chunks = [];
-	let currentChunk = "";
-
-	for (const label of labels) {
-		// Verifica se adicionar o próximo label ultrapassaria o limite
-		if (Buffer.byteLength(currentChunk + label, "utf8") > maxSize) {
-			chunks.push(currentChunk); // Salva o chunk atual
-			currentChunk = ""; // Reseta para o próximo bloco
-		}
-		currentChunk += label; // Adiciona o próximo label ao chunk
-	}
-	if (currentChunk) chunks.push(currentChunk); // Adiciona o último bloco, se houver
-	return chunks;
-}
-
 async function convertZplToPdf(zplContent: string): Promise<Buffer> {
 	const apiUrl = "http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/";
-	return new Promise<Buffer>((resolve, reject) => {
-		setTimeout(async () => {
-			try {
-				const response = await axios.post(apiUrl, zplContent, {
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-						Accept: "application/pdf",
-					},
-					responseType: "arraybuffer",
-				});
-				resolve(Buffer.from(response.data));
-			} catch (error) {
-				reject(error);
-			}
-		}, 250); // Tempo de espera para respeitar limite de requisições
-	});
+
+	try {
+		const response = await axios.post(apiUrl, zplContent, {
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: "application/pdf",
+			},
+			responseType: "arraybuffer",
+		});
+		return Buffer.from(response.data);
+	} catch (error: any) {
+		const errorDetails = error.response?.data
+			? `Error details: ${error.response.data.toString()}`
+			: error.message;
+
+		console.error(
+			`Error converting ZPL to PDF for content: ${zplContent.substring(
+				0,
+				20,
+			)}\n${errorDetails}`,
+		);
+		throw new Error(`Failed to convert ZPL to PDF: ${errorDetails}`);
+	}
+}
+
+async function processLabelsWithRateLimit(
+	labels: { labelName: string; label: string }[],
+	batchSize: number,
+	delayMs: number,
+): Promise<{ labelName: string; pdfBuffer: Buffer }[]> {
+	const results: { labelName: string; pdfBuffer: Buffer }[] = [];
+	let currentIndex = 0;
+
+	while (currentIndex < labels.length) {
+		const batch = labels.slice(currentIndex, currentIndex + batchSize);
+		const batchResults = await Promise.all(
+			batch.map(async ({ labelName, label }) => {
+				try {
+					const pdfBuffer = await convertZplToPdf(label);
+					return { labelName, pdfBuffer };
+				} catch (error: any) {
+					console.error(
+						`Failed to convert ${labelName} - ${label.length}: ${error.message}`,
+					);
+					return {
+						labelName,
+						pdfBuffer: Buffer.from(
+							`Failed to convert ${labelName}: ${error.message}`,
+						),
+					};
+				}
+			}),
+		);
+		results.push(...batchResults);
+		currentIndex += batchSize;
+
+		// Ajuste do atraso para evitar ultrapassar o limite de requisições
+		await new Promise((resolve) => setTimeout(resolve, delayMs));
+	}
+	return results;
 }
 
 export { zplToPdfConversor };

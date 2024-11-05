@@ -41,15 +41,22 @@
         <input type="file" id="fileInput" accept=".zip" required />
         <button type="submit">Converter</button>
     </form>
+    <p id="loading" style="display: none;">Carregando...</p>
     <a id="downloadLink" style="display: none;"></a>
 
     <script>
+        const loadingButton = document.getElementById('loading');
+        const downloadLink = document.getElementById('downloadLink');
+
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
             event.preventDefault(); // Impede o envio padrão do formulário
 
             const fileInput = document.getElementById('fileInput');
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
+
+            loadingButton.style.display = '';
+            downloadLink.style.display = 'none';
 
             try {
                 const response = await fetch('/conversor-zpl/upload', {
@@ -60,9 +67,11 @@
                 if (response.ok) {
                     const blob = await response.blob();
                     const url = URL.createObjectURL(blob);
+
+                    loadingButton.style.display = 'none';
                     
                     // Atualiza o link para download
-                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.style.display = '';
                     downloadLink.href = url;
                     downloadLink.download = 'converted.zip';
                     downloadLink.style.display = 'block';
