@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import { createServer, maxHeaderSize } from "node:http";
+import { createServer } from "node:http";
 import { routes } from "./routes";
 import files from "./routes/file";
 import { httpAllowedOrigins } from "../config/allowed-origins";

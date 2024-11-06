@@ -1,14 +1,16 @@
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import axios from "axios";
-import path from "path";
+import path from "node:path";
 import AdmZip from "adm-zip";
+import archiver from "archiver";
+import { PDFDocument } from "pdf-lib";
 
 const zplToPdfConversor = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-zplToPdfConversor.get("/", (req, res) => {
+zplToPdfConversor.get("/", (_, res) => {
 	res.sendFile(path.join(__dirname, "index.html"));
 });
 
@@ -26,7 +28,6 @@ async function uploadFile(req: Request, res: Response) {
 
 		const zip = new AdmZip(req.file.buffer);
 		const zipEntries = zip.getEntries();
-		const pdfZip = new AdmZip();
 
 		let labelsStore = [];
 
@@ -39,14 +40,10 @@ async function uploadFile(req: Request, res: Response) {
 				const content = entry.getData().toString("utf8");
 				const labels = content
 					.split(/(?=~DGR:)/)
-					// .split("^XZ")
 					.filter(
 						(label) => label.trim() !== "" && label.trim() !== '"',
 					)
 					.map((label) => `${label.replace("\n", "")}^XZ`);
-				// .filter(
-				// 	(label) => label.trim() !== "^XA^IDR:DEMO.GRF^FS^XZ",
-				// );
 
 				labels.forEach((label, index) => {
 					const labelName = `${entry.entryName.replace(
@@ -60,25 +57,91 @@ async function uploadFile(req: Request, res: Response) {
 			}
 		}
 
-		// return res.status(400).json({
-		// 	labelsStore,
-		// });
-
 		// Processa cada etiqueta ZPL isoladamente, respeitando o limite de taxa
 		const pdfBuffers = await processLabelsWithRateLimit(zplLabels, 1, 200);
 
-		for (const { labelName, pdfBuffer } of pdfBuffers) {
-			pdfZip.addFile(labelName, pdfBuffer);
-		}
+		const unitePdfs = req.body.unite;
 
-		const pdfZipBuffer = pdfZip.toBuffer();
-		res.set("Content-Type", "application/zip");
-		res.set("Content-Disposition", "attachment; filename=converted.zip");
-		res.send(pdfZipBuffer);
+		if (Number(unitePdfs)) {
+			await sendAllPdfsInSingleZip(pdfBuffers, res);
+		} else {
+			await sendAllPdfsSeparatedZip(pdfBuffers, res);
+		}
 	} catch (error: any) {
 		console.log(error.message);
 		return res.status(400).send(error.message);
 	}
+}
+
+async function sendAllPdfsInSingleZip(
+	pdfBuffers: {
+		labelName: string;
+		pdfBuffer: Buffer;
+	}[],
+	res: Response,
+) {
+	const combinedPdfBuffer = await combinePDFs(pdfBuffers);
+
+	// Crie um stream para o ZIP
+	const zipArchive = archiver("zip", { zlib: { level: 9 } });
+	const chunks: any[] = [];
+
+	// Coletar dados de buffer à medida que o ZIP é criado
+	zipArchive.on("data", (chunk) => chunks.push(chunk));
+
+	// Adiciona o PDF combinado no ZIP
+	zipArchive.append(Buffer.from(combinedPdfBuffer), {
+		name: "combined.pdf",
+	});
+
+	// Finaliza o ZIP
+	await zipArchive.finalize();
+
+	// Após finalizar, combine os chunks em um único buffer e envie a resposta
+	const zipBuffer = Buffer.concat(chunks);
+
+	res.set("Content-Type", "application/zip");
+	res.set("Content-Disposition", "attachment; filename=converted.zip");
+	res.send(zipBuffer);
+}
+
+async function sendAllPdfsSeparatedZip(
+	pdfBuffers: {
+		labelName: string;
+		pdfBuffer: Buffer;
+	}[],
+	res: Response,
+) {
+	const pdfZip = new AdmZip();
+
+	for (const { labelName, pdfBuffer } of pdfBuffers) {
+		pdfZip.addFile(labelName, pdfBuffer);
+	}
+
+	const pdfZipBuffer = pdfZip.toBuffer();
+	res.set("Content-Type", "application/zip");
+	res.set("Content-Disposition", "attachment; filename=converted.zip");
+	res.send(pdfZipBuffer);
+}
+
+async function combinePDFs(
+	pdfBuffers: {
+		labelName: string;
+		pdfBuffer: Buffer;
+	}[],
+) {
+	const combinedPdf = await PDFDocument.create();
+
+	for (const pdfBuffer of pdfBuffers) {
+		const pdfDoc = await PDFDocument.load(pdfBuffer.pdfBuffer);
+		const copiedPages = await combinedPdf.copyPages(
+			pdfDoc,
+			pdfDoc.getPageIndices(),
+		);
+		copiedPages.forEach((page) => combinedPdf.addPage(page));
+	}
+
+	return await combinedPdf.save();
 }
 
 async function convertZplToPdf(zplContent: string): Promise<Buffer> {

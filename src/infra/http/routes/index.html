@@ -37,10 +37,22 @@
 
     <h1>Conversor ZPL/TXT para PDF</h1>
     <p>Envie o arquivo ZIP</p>
-    <form id="uploadForm">
-        <input type="file" id="fileInput" accept=".zip" required />
-        <button type="submit">Converter</button>
+    
+    <form id="uploadForm" style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem;">
+            <div>
+                <input type="file" id="fileInput" accept=".zip" required />
+                <div>
+                    <input type="checkbox" name="unite" id="unite">
+                    <label for="unite">Únir etiquetas</label>
+                </div>
+            </div>
+            <div style="margin-top: auto;">
+                <button type="submit">Converter</button>
+            </div>
+        </div>
     </form>
+
     <p id="loading" style="display: none;">Carregando...</p>
     <a id="downloadLink" style="display: none;"></a>
 
@@ -51,9 +63,11 @@
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
             event.preventDefault(); // Impede o envio padrão do formulário
 
+            const uniteInput = document.getElementById('unite');
             const fileInput = document.getElementById('fileInput');
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
+            formData.append('unite', uniteInput.checked ? 1 : 0)
 
             loadingButton.style.display = '';
             downloadLink.style.display = 'none';
