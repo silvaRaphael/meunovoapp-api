@@ -1,5 +1,7 @@
 FROM node:lts-alpine as builder
 
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
 COPY package*.json ./

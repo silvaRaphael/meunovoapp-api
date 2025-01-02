@@ -31,6 +31,9 @@
         button:hover {
             background-color: #218838;
         }
+        #status:empty {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -54,25 +57,37 @@
     </form>
 
     <p id="loading" style="display: none;">Carregando...</p>
+    <p id="status"></p>
     <a id="downloadLink" style="display: none;"></a>
 
     <script>
         const loadingButton = document.getElementById('loading');
         const downloadLink = document.getElementById('downloadLink');
 
+        document.getElementById('fileInput').addEventListener('input', () => {
+            loadingButton.style.display = 'none';
+            downloadLink.style.display = 'none';
+            document.querySelector('#status').innerHTML = '';
+        });
+
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
             event.preventDefault(); // Impede o envio padrão do formulário
 
+            const id = crypto.randomUUID();
             const uniteInput = document.getElementById('unite');
             const fileInput = document.getElementById('fileInput');
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
-            formData.append('unite', uniteInput.checked ? 1 : 0)
+            formData.append('unite', uniteInput.checked ? 1 : 0);
+            formData.append('id', id);
+            localStorage.setItem('id', id);
 
             loadingButton.style.display = '';
             downloadLink.style.display = 'none';
 
             try {
+                setTimeout(getStatus, 500);
+                
                 const response = await fetch('/conversor-zpl/upload', {
                     method: 'POST',
                     body: formData
@@ -91,6 +106,7 @@
                     downloadLink.style.display = 'block';
                     downloadLink.textContent = 'Clique aqui para baixar o ZIP convertido';
                 } else {
+                    console.error(await response.json())
                     alert('Erro ao converter o arquivo. Tente novamente.');
                 }
             } catch (error) {
@@ -98,6 +114,30 @@
                 alert('Ocorreu um erro ao enviar o arquivo.');
             }
         });
+
+        async function getStatus() {
+            try {
+                const id = localStorage.getItem('id');
+
+                if(!id) return;
+
+                const response = await fetch(`/conversor-zpl/status/${id}`);
+
+                if (response.ok) {
+                    const json = await response.json();
+
+                    const statusEl = document.querySelector('#status');
+
+                    statusEl.innerHTML = `Este arquivo possuiu ${json.labels} etiquetas, tempo estimado ${json.time} segundo(s) para conversão.`;
+                } else {
+                    console.error(await response.json())
+                    alert('Erro ao receber informações do arquivo. Tente novamente.');
+                }
+            } catch (error) {
+                console.error(await response.json())
+                alert('Ocorreu um erro ao receber as informações do arquivo.');
+            }
+        }
     </script>
 
 </body>

@@ -10,6 +10,14 @@ const zplToPdfConversor = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const queueIds: Record<
+	string,
+	{
+		labels: number;
+		time: number;
+	}
+> = {};
+
 zplToPdfConversor.get("/", (_, res) => {
 	res.sendFile(path.join(__dirname, "index.html"));
 });
@@ -20,6 +28,17 @@ zplToPdfConversor.post(
 	(req: Request, res: Response) => uploadFile(req, res),
 );
 
+zplToPdfConversor.get("/status/:id", async (req: Request, res: Response) => {
+	const { labels, time } = queueIds[req.params.id] ?? { labels: 0, time: 0 };
+
+	delete queueIds[req.params.id];
+
+	res.json({
+		labels,
+		time,
+	});
+});
+
 async function uploadFile(req: Request, res: Response) {
 	try {
 		if (!req.file) {
@@ -28,8 +47,6 @@ async function uploadFile(req: Request, res: Response) {
 
 		const zip = new AdmZip(req.file.buffer);
 		const zipEntries = zip.getEntries();
-
-		let labelsStore = [];
 
 		const zplLabels: any[] = [];
 		for (const entry of zipEntries) {
@@ -52,10 +69,13 @@ async function uploadFile(req: Request, res: Response) {
 					)}_part${index + 1}.pdf`;
 					zplLabels.push({ index, labelName, label });
 				});
-
-				labelsStore.push({ labels });
 			}
 		}
+
+		queueIds[req.body.id] = {
+			labels: zplLabels.length,
+			time: zplLabels.length / 2.5,
+		};
 
 		// Processa cada etiqueta ZPL isoladamente, respeitando o limite de taxa
 		const pdfBuffers = await processLabelsWithRateLimit(zplLabels, 1, 200);
