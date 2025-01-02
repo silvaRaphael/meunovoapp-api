@@ -86,7 +86,7 @@
             downloadLink.style.display = 'none';
 
             try {
-                setTimeout(getStatus, 500);
+                setTimeout(getStatus, 1000);
                 
                 const response = await fetch('/conversor-zpl/upload', {
                     method: 'POST',
@@ -128,7 +128,7 @@
 
                     const statusEl = document.querySelector('#status');
 
-                    statusEl.innerHTML = `Este arquivo possuiu ${json.labels} etiquetas, tempo estimado ${json.time} segundo(s) para conversão.`;
+                    statusEl.innerHTML = json.labels ? `Este arquivo possui ${json.labels} etiquetas, tempo estimado ${json.time} segundo(s) para conversão.` : '';
                 } else {
                     console.error(await response.json())
                     alert('Erro ao receber informações do arquivo. Tente novamente.');

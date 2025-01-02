@@ -132,16 +132,42 @@ async function sendAllPdfsSeparatedZip(
 	}[],
 	res: Response,
 ) {
-	const pdfZip = new AdmZip();
+	const combinedPdfBuffer = await combinePDFs(pdfBuffers);
 
-	for (const { labelName, pdfBuffer } of pdfBuffers) {
-		pdfZip.addFile(labelName, pdfBuffer);
+	// Valide o PDF combinado antes de adicionar ao ZIP
+	if (combinedPdfBuffer.toString() !== "%PDF-") {
+		throw new Error("Invalid PDF format.");
 	}
 
-	const pdfZipBuffer = pdfZip.toBuffer();
+	// Crie um stream para o ZIP
+	const zipArchive = archiver("zip", { zlib: { level: 9 } });
+	const chunks: Buffer[] = [];
+
+	zipArchive.on("data", (chunk) => chunks.push(chunk));
+
+	// Adiciona o PDF combinado no ZIP
+	zipArchive.append(combinedPdfBuffer as any, { name: "combined.pdf" });
+
+	// Finaliza o ZIP
+	await zipArchive.finalize();
+
+	// Combine os chunks em um único buffer
+	const zipBuffer = Buffer.concat(chunks);
+
+	// Envie o arquivo ZIP como resposta
 	res.set("Content-Type", "application/zip");
 	res.set("Content-Disposition", "attachment; filename=converted.zip");
-	res.send(pdfZipBuffer);
+	res.send(zipBuffer);
+	// const pdfZip = new AdmZip();
+
+	// for (const { labelName, pdfBuffer } of pdfBuffers) {
+	// 	pdfZip.addFile(labelName, pdfBuffer);
+	// }
+
+	// const pdfZipBuffer = pdfZip.toBuffer();
+	// res.set("Content-Type", "application/zip");
+	// res.set("Content-Disposition", "attachment; filename=converted.zip");
+	// res.send(pdfZipBuffer);
 }
 
 async function combinePDFs(
@@ -152,15 +178,22 @@ async function combinePDFs(
 ) {
 	const combinedPdf = await PDFDocument.create();
 
-	for (const pdfBuffer of pdfBuffers) {
-		const pdfDoc = await PDFDocument.load(pdfBuffer.pdfBuffer);
+	// Iterando sobre o array de buffers de PDF
+	for (const { pdfBuffer } of pdfBuffers) {
+		// Carregando cada PDF individual
+		const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+		// Copiando todas as páginas do PDF carregado para o novo documento combinado
 		const copiedPages = await combinedPdf.copyPages(
 			pdfDoc,
 			pdfDoc.getPageIndices(),
 		);
+
+		// Adicionando as páginas copiadas ao documento combinado
 		copiedPages.forEach((page) => combinedPdf.addPage(page));
 	}
 
+	// Retornando o buffer do PDF combinado
 	return await combinedPdf.save();
 }
 
